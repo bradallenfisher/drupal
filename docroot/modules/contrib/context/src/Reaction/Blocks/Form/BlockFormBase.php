@@ -3,6 +3,7 @@
 namespace Drupal\context\Reaction\Blocks\Form;
 
 use Drupal\block\BlockRepositoryInterface;
+use Drupal\block\Entity\Block;
 use Drupal\context\ContextManager;
 use Drupal\context\ContextReactionManager;
 use Drupal\context\Form\AjaxFormTrait;
@@ -10,6 +11,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RemoveCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormBuilderInterface;
@@ -103,6 +105,13 @@ abstract class BlockFormBase extends FormBase {
   protected $request;
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs a new VariantPluginFormBase.
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $block_manager
@@ -119,6 +128,8 @@ abstract class BlockFormBase extends FormBase {
    *   The Context modules context manager.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The current request.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   The module handler.
    */
   public function __construct(
     PluginManagerInterface $block_manager,
@@ -127,7 +138,8 @@ abstract class BlockFormBase extends FormBase {
     FormBuilderInterface $formBuilder,
     ContextReactionManager $contextReactionManager,
     ContextManager $contextManager,
-    RequestStack $requestStack
+    RequestStack $requestStack,
+    ModuleHandlerInterface $moduleHandler
   ) {
     $this->blockManager = $block_manager;
     $this->contextRepository = $contextRepository;
@@ -136,6 +148,7 @@ abstract class BlockFormBase extends FormBase {
     $this->contextReactionManager = $contextReactionManager;
     $this->contextManager = $contextManager;
     $this->request = $requestStack->getCurrentRequest();
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
@@ -149,7 +162,8 @@ abstract class BlockFormBase extends FormBase {
       $container->get('form_builder'),
       $container->get('plugin.manager.context_reaction'),
       $container->get('context.manager'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('module_handler')
     );
   }
 
@@ -271,6 +285,12 @@ abstract class BlockFormBase extends FormBase {
     // Disable cache on form to prevent ajax forms from failing.
     $form_state->disableCache();
 
+    // Call hook_form_alter and hook_form_block_form_alter so form alter hooks
+    // changing the block_form will also be called here for e.g. adding
+    // third party settings.
+    $dummy_form_id = 'block_form';
+    $this->moduleHandler->alter(['form', 'form_block_form'], $form, $form_state, $dummy_form_id);
+
     return $form;
   }
 
@@ -324,6 +344,7 @@ abstract class BlockFormBase extends FormBase {
       'css_class' => $form_state->getValue('css_class'),
       'unique' => $form_state->getValue('unique'),
       'context_id' => $this->context->id(),
+      'third_party_settings' => $form_state->getValue('third_party_settings', []),
     ]);
 
     // Add/Update the block.
@@ -388,6 +409,21 @@ abstract class BlockFormBase extends FormBase {
     }
 
     return $regions;
+  }
+
+  /**
+   * Returns a block entity based on the configured values in context.
+   *
+   * Method that can be used by modules depending on
+   * hook_form_block_form_alter(). Since that form is an entity form, the
+   * getEntity method is available. Since hook_form_block_form_alter is also
+   * called in this form, this will break modules depending on this method.
+   *
+   * @return \Drupal\block\BlockInterface
+   *   A block entity.
+   */
+  public function getEntity() {
+    return Block::create($this->block->getConfiguration() + ['plugin' => $this->block->getPluginId()]);
   }
 
 }

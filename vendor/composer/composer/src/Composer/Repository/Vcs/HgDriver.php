@@ -28,7 +28,6 @@ class HgDriver extends VcsDriver
     protected $branches;
     protected $rootIdentifier;
     protected $repoDir;
-    protected $infoCache = array();
 
     /**
      * {@inheritDoc}
@@ -126,7 +125,7 @@ class HgDriver extends VcsDriver
         $this->process->execute($resource, $content, $this->repoDir);
 
         if (!trim($content)) {
-            return;
+            return null;
         }
 
         return $content;
@@ -228,8 +227,8 @@ class HgDriver extends VcsDriver
             return false;
         }
 
-        $processExecutor = new ProcessExecutor($io);
-        $exit = $processExecutor->execute(sprintf('hg identify -- %s', ProcessExecutor::escape($url)), $ignored);
+        $process = new ProcessExecutor($io);
+        $exit = $process->execute(sprintf('hg identify -- %s', ProcessExecutor::escape($url)), $ignored);
 
         return $exit === 0;
     }

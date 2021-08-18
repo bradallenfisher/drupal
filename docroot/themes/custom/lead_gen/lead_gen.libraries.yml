@@ -1,9 +1,0 @@
-global-styling:
-  version: 1.x
-  css:
-    theme:
-      css/skin1.css: {}
-global-scripts:
-  version: 1.x
-  js:
-    js/scripts.js: {}

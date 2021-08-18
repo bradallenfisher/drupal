@@ -390,4 +390,54 @@ class Context extends ConfigEntityBase implements ContextInterface {
     $clone->save();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    $dependencies = parent::calculateDependencies();
+    /** @var \Drupal\context\Plugin\ContextReactionPluginCollection $reaction_collection */
+    $reaction_collection = $this->getReactions();
+    /** @var \Drupal\Core\Condition\ConditionPluginCollection $condition_collection */
+    $condition_collection = $this->getConditions();
+    if (empty($reaction_collection) && empty($condition_collection)) {
+      return $dependencies;
+    }
+    $this->calculateConditionDependencies($condition_collection);
+    $this->calculateReactionDependencies($reaction_collection);
+
+    return $this;
+  }
+
+  /**
+   * Set context dependencies based on the reactions set.
+   *
+   * @param \Drupal\context\Plugin\ContextReactionPluginCollection $reaction_collection
+   *   The Reaction Plugin collection.
+   */
+  public function calculateReactionDependencies(ContextReactionPluginCollection $reaction_collection) {
+    $instance_ids = $reaction_collection->getInstanceIds();
+    foreach ($instance_ids as $instance_id) {
+      /** @var \Drupal\context\ContextReactionPluginBase $plugin */
+      $plugin = $reaction_collection->get($instance_id);
+      $plugin_dependencies = $this->getPluginDependencies($plugin);
+      $this->addDependencies($plugin_dependencies);
+    }
+  }
+
+  /**
+   * Set context dependencies based on the conditions set.
+   *
+   * @param \Drupal\Core\Condition\ConditionPluginCollection $condition_collection
+   *   The Condition Plugin collection.
+   */
+  public function calculateConditionDependencies(ConditionPluginCollection $condition_collection) {
+    $instance_ids = $condition_collection->getInstanceIds();
+    foreach ($instance_ids as $instance_id) {
+      /** @var \Drupal\Core\Condition\ConditionPluginBase $plugin */
+      $plugin = $condition_collection->get($instance_id);
+      $plugin_dependencies = $this->getPluginDependencies($plugin);
+      $this->addDependencies($plugin_dependencies);
+    }
+  }
+
 }

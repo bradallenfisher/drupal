@@ -778,7 +778,7 @@ button, select {
           -webkit-justify-content: flex-start;
               -ms-flex-pack: start;
                   justify-content: flex-start; } }
-      .header .header-inner .logo i {
+      .header .header-inner .logo i, .header .header-inner .logo .svg-inline--fa {
         font-size: 2.5em;
         padding-left: 10px;
         color: #FF69B4; }
@@ -1039,6 +1039,14 @@ a:visited {
   width: 100%;
   height: 100%; }
 
+.rrssb-facebook .rrssb-icon {
+  background: url(../img/facebook.svg); }
+
+.rrssb-twitter .rrssb-icon {
+  background: url(../img/twitter.svg); }
+
+.rrssb-pinterest .rrssb-icon {
+  background: url(../img/pinterest.svg); }
 
 .click-search-form {
   padding: 20px; }
@@ -1047,6 +1055,13 @@ a:visited {
 
 .click-search-form.open {
   display: block; }
+
+.search-block-form {
+  box-sizing: border-box;
+  max-width: 1350px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px; }
 
 .js input.form-autocomplete {
   padding-left: 10px; }

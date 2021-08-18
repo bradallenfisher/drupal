@@ -12,6 +12,7 @@ use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Core\Condition\ConditionAccessResolverTrait;
 use Drupal\Core\Plugin\Context\ContextHandlerInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Drupal\Core\Routing\CurrentRouteMatch;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
@@ -57,6 +58,13 @@ class ContextManager {
   protected $contextConditionsEvaluated = FALSE;
 
   /**
+   * An array of all contexts.
+   *
+   * @var \Drupal\Context\ContextInterface[]
+   */
+  protected $contexts = [];
+
+  /**
    * An array of contexts that have been evaluated and are active.
    *
    * @var array
@@ -77,6 +85,12 @@ class ContextManager {
    */
   protected $themeManager;
 
+  /** The route match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $currentRouteMatch;
+
   /**
    * Construct.
    *
@@ -96,29 +110,69 @@ class ContextManager {
     ContextRepositoryInterface $contextRepository,
     ContextHandlerInterface $contextHandler,
     EntityFormBuilderInterface $entityFormBuilder,
-    ThemeManagerInterface $themeManager
+    ThemeManagerInterface $themeManager,
+    CurrentRouteMatch $currentRouteMatch
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->contextRepository = $contextRepository;
     $this->contextHandler = $contextHandler;
     $this->entityFormBuilder = $entityFormBuilder;
     $this->themeManager = $themeManager;
+    $this->currentRouteMatch = $currentRouteMatch;
   }
 
   /**
    * Get all contexts.
    *
-   * @return \Drupal\context\Entity\Context[]
-   *   An array with the context entity.
+   * @return \Drupal\context\ContextInterface[]
+   *   List of contexts, keyed by id.
    */
   public function getContexts() {
+    if (!empty($this->contexts)) {
+      return $this->contexts;
+    }
 
-    $contexts = $this->entityTypeManager->getStorage('context')->loadByProperties();
+    $this->contexts = $this->entityTypeManager->getStorage('context')->loadByProperties();
 
     // Sort the contexts by their weight.
-    uasort($contexts, [$this, 'sortContextsByWeight']);
+    uasort($this->contexts, [$this, 'sortContextsByWeight']);
 
-    return $contexts;
+    return $this->contexts;
+  }
+
+  /**
+   * Get a single context by id.
+   *
+   * @param string $id
+   *   The context id.
+   *
+   * @return array|\Drupal\context\ContextInterface
+   *   The context object if found, NULL otherwise.
+   */
+  public function getContext($id) {
+    $contexts = $this->getContexts();
+    $currentContext = $this->currentRouteMatch->getParameter('context') ? $this->currentRouteMatch->getParameter('context')->id() : '';
+    $ids = [];
+    if ($id) {
+      if (strpos($id, '*') !== FALSE) {
+        $id = preg_quote($id);
+        $id = str_replace('\*', '.*', $id);
+        foreach ($contexts as $context) {
+          if (preg_match('/^' . $id . '$/i', $context->getName())) {
+            if ($currentContext !== $context->getName()) {
+              $ids[$context->getName()] = $context;
+            }
+          }
+        }
+        return $ids;
+      }
+      else {
+        if (array_key_exists($id, $contexts)) {
+          return $contexts[$id];
+        }
+      }
+    }
+
   }
 
   /**

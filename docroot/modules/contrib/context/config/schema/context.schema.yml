@@ -72,6 +72,54 @@ condition.plugin.http_status_code:
           type: integer
           label: '404'
 
+condition.plugin.user_status:
+  type: condition.plugin
+  label: 'User Profile Page Condition'
+  mapping:
+    user_status:
+      type: mapping
+      label: 'User status'
+      mapping:
+        viewing_profile:
+          type: string
+          label: 'viewing_profile'
+        logged_viewing_profile:
+          type: string
+          label: 'logged_viewing_profile'
+        own_page_true:
+          type: string
+          label: 'own_page_true'
+        field_value:
+          type: string
+          label: 'field_value'
+    user_fields:
+      type: string
+      label: 'User fields'
+
+condition.plugin.request_domain:
+  type: condition.plugin
+  label: 'Request domain'
+  mapping:
+    domains:
+      type: string
+      label: 'Domains'
+
+condition.plugin.context_all:
+  type: condition.plugin
+  label: 'Context (all)'
+  mapping:
+    values:
+      type: string
+      label: 'Context (all)'
+
+condition.plugin.context:
+  type: condition.plugin
+  label: 'Context (any)'
+  mapping:
+    values:
+      type: string
+      label: 'Context (any)'
+
 reaction.plugin.menu:
   type: reaction.plugin
   mapping:

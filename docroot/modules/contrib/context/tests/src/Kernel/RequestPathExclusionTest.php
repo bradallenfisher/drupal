@@ -20,7 +20,7 @@ class RequestPathExclusionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['system', 'path', 'field', 'context'];
+  protected static $modules = ['system', 'path', 'field', 'context'];
 
   /**
    * The condition plugin manager used for testing.
@@ -53,7 +53,7 @@ class RequestPathExclusionTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installSchema('system', ['sequences']);

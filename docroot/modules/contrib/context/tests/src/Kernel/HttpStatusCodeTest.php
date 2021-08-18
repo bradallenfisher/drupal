@@ -42,7 +42,7 @@ class HttpStatusCodeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['context'];
+  protected static $modules = ['context'];
 
   /**
    * Current path stack.
@@ -54,7 +54,7 @@ class HttpStatusCodeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->pluginManager = $this->container->get('plugin.manager.condition');
@@ -135,19 +135,19 @@ class HttpStatusCodeTest extends KernelTestBase {
     $this->aliasManager->addAlias('/my/status/page', '/my/status/page');
 
     $this->assertFalse($condition->execute(), 'Status codes are not matching');
-    $this->assertEquals('The http status code is 200 or 403', $condition->summary(), 'The http status codes do not match');
+    $this->assertEquals('The http status code is not 200 or 403', $condition->summary(), 'The http status codes do not match');
 
     $request->attributes->set('exception', new HttpException(403));
     $this->requestStack->push($request);
     $condition->setConfig('status_codes', [403 => '403']);
     $this->assertFalse($condition->execute(), 'Status code is not 403');
-    $this->assertEquals('The http status code is 403', $condition->summary(), 'The http status code does not match');
+    $this->assertEquals('The http status code is not 403', $condition->summary(), 'The http status code does not match');
 
     $request->attributes->set('exception', new HttpException(200));
     $this->requestStack->push($request);
     $condition->setConfig('status_codes', [200 => '200']);
     $this->assertFalse($condition->execute(), 'Status code is not 200');
-    $this->assertEquals('The http status code is 200', $condition->summary(), 'The http status code does not match');
+    $this->assertEquals('The http status code is not 200', $condition->summary(), 'The http status code does not match');
 
     // Exception is empty, so default status code should be 200.
     $this->requestStack->push($request);

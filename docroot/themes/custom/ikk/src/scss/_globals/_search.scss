@@ -8,7 +8,10 @@
 .click-search-form.open {
   display: block;
 }
-
+.search-block-form {
+	@include container();
+	padding: 20px;
+}
 .js input.form-autocomplete {
   padding-left: 10px;
 }

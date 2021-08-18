@@ -57,7 +57,9 @@ class Package extends BasePackage
     protected $autoload = array();
     protected $devAutoload = array();
     protected $includePaths = array();
-    protected $archiveExcludes = array();
+    protected $isDefaultBranch = false;
+    /** @var array */
+    protected $transportOptions = array();
 
     /**
      * Creates a new in memory package.
@@ -123,7 +125,7 @@ class Package extends BasePackage
     public function getTargetDir()
     {
         if (null === $this->targetDir) {
-            return;
+            return null;
         }
 
         return ltrim(preg_replace('{ (?:^|[\\\\/]+) \.\.? (?:[\\\\/]+|$) (?:\.\.? (?:[\\\\/]+|$) )*}x', '/', $this->targetDir), '/');
@@ -226,7 +228,7 @@ class Package extends BasePackage
     }
 
     /**
-     * @param array|null $mirrors
+     * {@inheritDoc}
      */
     public function setSourceMirrors($mirrors)
     {
@@ -314,7 +316,7 @@ class Package extends BasePackage
     }
 
     /**
-     * @param array|null $mirrors
+     * {@inheritDoc}
      */
     public function setDistMirrors($mirrors)
     {
@@ -335,6 +337,22 @@ class Package extends BasePackage
     public function getDistUrls()
     {
         return $this->getUrls($this->distUrl, $this->distMirrors, $this->distReference, $this->distType, 'dist');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTransportOptions()
+    {
+        return $this->transportOptions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setTransportOptions(array $options)
+    {
+        $this->transportOptions = $options;
     }
 
     /**
@@ -552,21 +570,36 @@ class Package extends BasePackage
     }
 
     /**
-     * Sets a list of patterns to be excluded from archives
-     *
-     * @param array $excludes
+     * @param bool $defaultBranch
      */
-    public function setArchiveExcludes(array $excludes)
+    public function setIsDefaultBranch($defaultBranch)
     {
-        $this->archiveExcludes = $excludes;
+        $this->isDefaultBranch = $defaultBranch;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getArchiveExcludes()
+    public function isDefaultBranch()
     {
-        return $this->archiveExcludes;
+        return $this->isDefaultBranch;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setSourceDistReferences($reference)
+    {
+        $this->setSourceReference($reference);
+
+        // only bitbucket, github and gitlab have auto generated dist URLs that easily allow replacing the reference in the dist URL
+        // TODO generalize this a bit for self-managed/on-prem versions? Some kind of replace token in dist urls which allow this?
+        if (preg_match('{^https?://(?:(?:www\.)?bitbucket\.org|(api\.)?github\.com|(?:www\.)?gitlab\.com)/}i', $this->getDistUrl())) {
+            $this->setDistReference($reference);
+            $this->setDistUrl(preg_replace('{(?<=/|sha=)[a-f0-9]{40}(?=/|$)}i', $reference, $this->getDistUrl()));
+        } elseif ($this->getDistReference()) { // update the dist reference if there was one, but if none was provided ignore it
+            $this->setDistReference($reference);
+        }
     }
 
     /**
@@ -590,17 +623,24 @@ class Package extends BasePackage
         if (!$url) {
             return array();
         }
+
+        if ($urlType === 'dist' && false !== strpos($url, '%')) {
+            $url = ComposerMirror::processUrl($url, $this->name, $this->version, $ref, $type, $this->prettyVersion);
+        }
+
         $urls = array($url);
         if ($mirrors) {
             foreach ($mirrors as $mirror) {
                 if ($urlType === 'dist') {
-                    $mirrorUrl = ComposerMirror::processUrl($mirror['url'], $this->name, $this->version, $ref, $type);
+                    $mirrorUrl = ComposerMirror::processUrl($mirror['url'], $this->name, $this->version, $ref, $type, $this->prettyVersion);
                 } elseif ($urlType === 'source' && $type === 'git') {
                     $mirrorUrl = ComposerMirror::processGitUrl($mirror['url'], $this->name, $url, $type);
                 } elseif ($urlType === 'source' && $type === 'hg') {
                     $mirrorUrl = ComposerMirror::processHgUrl($mirror['url'], $this->name, $url, $type);
+                } else {
+                    continue;
                 }
-                if (!in_array($mirrorUrl, $urls)) {
+                if (!\in_array($mirrorUrl, $urls)) {
                     $func = $mirror['preferred'] ? 'array_unshift' : 'array_push';
                     $func($urls, $mirrorUrl);
                 }

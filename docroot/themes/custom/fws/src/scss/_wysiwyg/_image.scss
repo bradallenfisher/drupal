@@ -1,9 +1,0 @@
-.wysiwyg-float-left-image {
-
-  @include breakpoint(800px, true) {
-    max-width: 400px;
-    float: left;
-    margin-right: 20px;
-    margin-top: 10px;
-  }
-}

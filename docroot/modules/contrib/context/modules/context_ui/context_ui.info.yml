@@ -9,7 +9,7 @@ configure: entity.context.collection
 dependencies:
   - context:context
 
-# Information added by Drupal.org packaging script on 2021-04-26
-version: '8.x-4.0-beta6'
+# Information added by Drupal.org packaging script on 2021-08-05
+version: '8.x-4.1'
 project: 'context'
-datestamp: 1619440413
+datestamp: 1628187192

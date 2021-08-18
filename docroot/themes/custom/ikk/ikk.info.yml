@@ -2,7 +2,7 @@ name: ikk
 type: theme
 description: 'ikk theme'
 package: ikk
-core: 8.x
+core_version_requirement: ^8 || ^9
 libraries:
   - ikk/global-styling
 

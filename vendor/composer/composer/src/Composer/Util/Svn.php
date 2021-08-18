@@ -85,8 +85,7 @@ class Svn
     public static function cleanEnv()
     {
         // clean up env for OSX, see https://github.com/composer/composer/issues/2146#issuecomment-35478940
-        putenv("DYLD_LIBRARY_PATH");
-        unset($_SERVER['DYLD_LIBRARY_PATH']);
+        Platform::clearEnv('DYLD_LIBRARY_PATH');
     }
 
     /**
@@ -139,7 +138,7 @@ class Svn
             if ($type !== 'out') {
                 return;
             }
-            if ('Redirecting to URL ' === substr($buffer, 0, 19)) {
+            if (strpos($buffer, 'Redirecting to URL ') === 0) {
                 return;
             }
             $output .= $buffer;
@@ -207,7 +206,7 @@ class Svn
         $this->credentials['username'] = $this->io->ask("Username: ");
         $this->credentials['password'] = $this->io->askAndHideAnswer("Password: ");
 
-        $this->cacheCredentials = $this->io->askConfirmation("Should Subversion cache these credentials? (yes/no) ", true);
+        $this->cacheCredentials = $this->io->askConfirmation("Should Subversion cache these credentials? (yes/no) ");
 
         return $this;
     }
@@ -304,7 +303,7 @@ class Svn
             $this->createAuthFromUrl();
         }
 
-        return $this->hasAuth;
+        return (bool) $this->hasAuth;
     }
 
     /**

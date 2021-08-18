@@ -220,6 +220,10 @@ class Perforce
         $this->executeCommand($command);
     }
 
+    /**
+     * @param  string  $name
+     * @return ?string
+     */
     protected function getP4variable($name)
     {
         if ($this->windowsFlag) {
@@ -273,7 +277,7 @@ class Perforce
         if ($useClient) {
             $p4Command .= '-c ' . $this->getClient() . ' ';
         }
-        $p4Command = $p4Command . '-p ' . $this->getPort() . ' ' . $command;
+        $p4Command .= '-p ' . $this->getPort() . ' ' . $command;
 
         return $p4Command;
     }
@@ -389,7 +393,6 @@ class Perforce
             } else {
                 $command = 'echo ' . ProcessExecutor::escape($password)  . ' | ' . $this->generateP4Command(' login -a', false);
                 $exitCode = $this->executeCommand($command);
-                $result = trim($this->commandResult);
                 if ($exitCode) {
                     throw new \Exception("Error logging in:" . $this->process->getErrorOutput());
                 }
@@ -427,9 +430,7 @@ class Perforce
     {
         $index = strpos($identifier, '@');
         if ($index === false) {
-            $path = $identifier. '/' . $file;
-
-            return $path;
+            return $identifier. '/' . $file;
         }
 
         $path = substr($identifier, 0, $index) . '/' . $file . substr($identifier, $index);
@@ -476,9 +477,7 @@ class Perforce
         $lastCommitArr = explode(' ', $lastCommit);
         $lastCommitNum = $lastCommitArr[1];
 
-        $branches = array('master' => $possibleBranches[$this->p4Branch] . '@'. $lastCommitNum);
-
-        return $branches;
+        return array('master' => $possibleBranches[$this->p4Branch] . '@'. $lastCommitNum);
     }
 
     public function getTags()
@@ -519,7 +518,7 @@ class Perforce
     }
 
     /**
-     * @param string $reference
+     * @param  string     $reference
      * @return mixed|null
      */
     protected function getChangeList($reference)
@@ -541,8 +540,8 @@ class Perforce
     }
 
     /**
-     * @param string $fromReference
-     * @param string $toReference
+     * @param  string     $fromReference
+     * @param  string     $toReference
      * @return mixed|null
      */
     public function getCommitLogs($fromReference, $toReference)
