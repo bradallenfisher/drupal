@@ -259,6 +259,25 @@ image.effect.image_effects_resize_percentage:
       type: string
       label: 'Height in px or %'
 
+image.effect.image_effects_rotate:
+  type: mapping
+  label: 'Image rotate'
+  mapping:
+    degrees:
+      type: integer
+      label: 'Rotation angle'
+    background_color:
+      label: 'Background color'
+      type: color_hex
+    fallback_transparency_color:
+      label: 'Fallback color for full transparency, when image or toolkit do not support it'
+      type: color_hex
+    method:
+      type: string
+      label: 'Determine how the rotation angle is calculated'
+      constraints:
+        AllowedValues: ['exact', 'pseudorandom', 'random']
+
 image.effect.image_effects_scale_and_smart_crop:
   type: mapping
   label: 'Similar to Scale and Crop, but preserves the portion of the image with the most entropy.'

@@ -1,10 +1,10 @@
 name: layout_section_classes_test
 type: module
-core: 8.x
+package: Testing
 dependencies:
   layout_section_classes:layout_section_classes
 
-# Information added by Drupal.org packaging script on 2020-01-15
-version: '8.x-1.0-rc6'
+# Information added by Drupal.org packaging script on 2021-11-05
+version: '8.x-1.0'
 project: 'layout_section_classes'
-datestamp: 1579065499
+datestamp: 1636082105

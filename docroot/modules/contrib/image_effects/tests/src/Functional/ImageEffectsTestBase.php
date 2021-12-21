@@ -168,7 +168,7 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
    * re-rendered each time.
    */
   protected function getImageTag($variables) {
-    return str_replace("\n", NULL, \Drupal::service('renderer')->renderRoot($variables));
+    return str_replace("\n", '', \Drupal::service('renderer')->renderRoot($variables));
   }
 
   /**
@@ -269,20 +269,20 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
   /**
    * Assert two colors are equal by RGBA.
    */
-  public function assertColorsAreEqual(array $actual, array $expected): void {
-    $this->assertColorsAreClose($actual, $expected, 0);
+  public function assertColorsAreEqual(array $actual, array $expected, string $message = ''): void {
+    $this->assertColorsAreClose($actual, $expected, 0, $message);
   }
 
   /**
    * Assert two colors are not equal by RGBA.
    */
-  public function assertColorsAreNotEqual(array $actual, array $expected): void {
+  public function assertColorsAreNotEqual(array $actual, array $expected, string $message = ''): void {
     // Fully transparent colors are equal, regardless of RGB.
     if ($expected[3] == 127) {
-      $this->assertNotEquals(127, $actual[3]);
+      $this->assertNotEquals(127, $actual[3], $message);
       return;
     }
-    $this->assertColorsAreNotClose($actual, $expected, 0);
+    $this->assertColorsAreNotClose($actual, $expected, 0, $message);
   }
 
   /**
@@ -297,14 +297,16 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
    *   The expected RGBA array.
    * @param int $tolerance
    *   The acceptable difference between the colors.
+   * @param string $message
+   *   (Optional) A message presented on assertion failure.
    */
-  public function assertColorsAreClose(array $actual, array $expected, $tolerance): void {
+  public function assertColorsAreClose(array $actual, array $expected, $tolerance, string $message = ''): void {
     // Fully transparent colors are equal, regardless of RGB.
     if ($actual[3] == 127 && $expected[3] == 127) {
       return;
     }
     $distance = pow(($actual[0] - $expected[0]), 2) + pow(($actual[1] - $expected[1]), 2) + pow(($actual[2] - $expected[2]), 2) + pow(($actual[3] - $expected[3]), 2);
-    $this->assertLessThanOrEqual($tolerance, $distance, "Actual: {" . implode(',', $actual) . "}, Expected: {" . implode(',', $expected) . "}, Distance: " . $distance . ", Tolerance: " . $tolerance);
+    $this->assertLessThanOrEqual($tolerance, $distance, $message . " Actual: {" . implode(',', $actual) . "}, Expected: {" . implode(',', $expected) . "}, Distance: " . $distance . ", Tolerance: " . $tolerance);
   }
 
   /**
@@ -319,10 +321,12 @@ abstract class ImageEffectsTestBase extends BrowserTestBase {
    *   The expected RGBA array.
    * @param int $tolerance
    *   The acceptable difference between the colors.
+   * @param string $message
+   *   (Optional) A message presented on assertion failure.
    */
-  public function assertColorsAreNotClose(array $actual, array $expected, $tolerance): void {
+  public function assertColorsAreNotClose(array $actual, array $expected, $tolerance, string $message = ''): void {
     $distance = pow(($actual[0] - $expected[0]), 2) + pow(($actual[1] - $expected[1]), 2) + pow(($actual[2] - $expected[2]), 2) + pow(($actual[3] - $expected[3]), 2);
-    $this->assertGreaterThan($tolerance, $distance, "Actual: {" . implode(',', $actual) . "}, Expected: {" . implode(',', $expected) . "}, Distance: " . $distance . ", Tolerance: " . $tolerance);
+    $this->assertGreaterThan($tolerance, $distance, $message . " Actual: {" . implode(',', $actual) . "}, Expected: {" . implode(',', $expected) . "}, Distance: " . $distance . ", Tolerance: " . $tolerance);
   }
 
   /**

@@ -1960,3 +1960,10 @@ ul.fontawesome.circle-check li::before {
   content: "";
   display: block;
   clear: both; }
+
+  .spb_top_center {
+    top: 0;
+    position: relative;
+    margin: 50px auto;
+    max-width: 90%;
+}

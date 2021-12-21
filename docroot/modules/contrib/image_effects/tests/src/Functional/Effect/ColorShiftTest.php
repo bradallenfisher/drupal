@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Color Shift effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class ColorShiftTest extends ImageEffectsTestBase {
 

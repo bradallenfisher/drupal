@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests the image analysis helper methods.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class GdImageAnalysisTest extends TestCase {
 

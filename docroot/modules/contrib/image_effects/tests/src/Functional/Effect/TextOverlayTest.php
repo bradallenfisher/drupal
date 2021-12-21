@@ -8,7 +8,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Text overlay effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class TextOverlayTest extends ImageEffectsTestBase {
 
@@ -20,6 +20,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
       'file_mdm',
       'file_mdm_font',
       'file_test',
+      'vendor_stream_wrapper',
     ]);
     parent::setUp();
   }
@@ -50,7 +51,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
     $this->changeToolkit($toolkit_id, $toolkit_config, $toolkit_settings);
 
     // Copy the font file to the test path.
-    $this->fileSystem->copy(drupal_get_path('module', 'image_effects') . '/tests/fonts/LinLibertineTTF_5.3.0_2012_07_02/LinLibertine_Rah.ttf', 'dummy-remote://', FileSystemInterface::EXISTS_REPLACE);
+    $this->fileSystem->copy('vendor://fileeye/linuxlibertine-fonts/LinLibertine_Rah.ttf', 'dummy-remote://', FileSystemInterface::EXISTS_REPLACE);
 
     // Add Text overlay effects to the test image style.
     // Different ways to access the same font file, via URI (local and remote),
@@ -59,7 +60,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
       'id' => 'image_effects_text_overlay',
       'data' => [
         'text_default][text_string' => 'the quick brown fox jumps over the lazy dog',
-        'font][uri' => drupal_get_path('module', 'image_effects') . '/tests/fonts/LinLibertineTTF_5.3.0_2012_07_02/LinLibertine_Rah.ttf',
+        'font][uri' => $this->fileSystem->realpath('vendor://fileeye/linuxlibertine-fonts/LinLibertine_Rah.ttf'),
         'font][size' => 40,
         'layout][position][extended_color][container][transparent' => FALSE,
         'layout][position][extended_color][container][hex' => '#FF00FF',
@@ -71,7 +72,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
       'id' => 'image_effects_text_overlay',
       'data' => [
         'text_default][text_string' => 'the quick brown fox jumps over the lazy dog',
-        'font][uri' => 'public://LinLibertine_Rah.ttf',
+        'font][uri' => 'vendor://fileeye/linuxlibertine-fonts/LinLibertine_Rah.ttf',
         'font][size' => 10,
         'layout][position][extended_color][container][transparent' => FALSE,
         'layout][position][extended_color][container][hex' => '#FF00FF',
@@ -135,7 +136,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
         '#width' => $image->getWidth(),
         '#height' => $image->getHeight(),
       ];
-      $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$derivative_image->getWidth()}\" height=\"{$derivative_image->getHeight()}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$derivative_image->getWidth()}\" height=\"{$derivative_image->getHeight()}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
     }
   }
 
@@ -148,7 +149,7 @@ class TextOverlayTest extends ImageEffectsTestBase {
       'id' => 'image_effects_text_overlay',
       'data' => [
         'text_default][text_string' => 'the quick brown fox jumps over the lazy dog',
-        'font][uri' => drupal_get_path('module', 'image_effects') . '/tests/fonts/LinLibertineTTF_5.3.0_2012_07_02/LinLibertine_Rah.ttf',
+        'font][uri' => 'vendor://fileeye/linuxlibertine-fonts/LinLibertine_Rah.ttf',
         'font][size' => 40,
         'layout][position][extended_color][container][transparent' => FALSE,
         'layout][position][extended_color][container][hex' => '#FF00FF',

@@ -46,7 +46,7 @@ EOD;
    * @see http://php.net/manual/en/function.preg-match.php
    * @see http://drupal.org/node/465638
    */
-  public static function unicodePregMatch($pattern, $subject, &$matches, $flags = NULL, $offset = 0) {
+  public static function unicodePregMatch($pattern, $subject, &$matches, $flags = 0, $offset = 0) {
     // Convert the offset value from characters to bytes.
     // NOTE - strlen is used on purpose here to get string length in bytes.
     // @see https://www.drupal.org/node/465638#comment-1600860

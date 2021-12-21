@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Auto Orientation effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class AutoOrientTest extends ImageEffectsTestBase {
 
@@ -100,7 +100,7 @@ class AutoOrientTest extends ImageEffectsTestBase {
         '#width' => $image->getWidth(),
         '#height' => $image->getHeight(),
       ];
-      $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$data['derivative_width']}\" height=\"{$data['derivative_height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+      $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"{$data['derivative_width']}\" height=\"{$data['derivative_height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
 
       // Check that ::applyEffect generates image with expected dimensions.
       $derivative_uri = $this->testImageStyle->buildUri($original_uri);

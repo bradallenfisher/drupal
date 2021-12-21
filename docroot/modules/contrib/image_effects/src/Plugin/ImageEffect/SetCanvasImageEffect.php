@@ -9,7 +9,7 @@ use Drupal\image\ConfigurableImageEffectBase;
 use Drupal\image_effects\Component\ImageUtility;
 
 /**
- * Class SetCanvasImageEffect.
+ * Defines the size of the working canvas and background color.
  *
  * @ImageEffect(
  *   id = "image_effects_set_canvas",

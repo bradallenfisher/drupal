@@ -27,6 +27,11 @@ build:
         testgroups: '--all'
         suppress-deprecations: true
         halt-on-fail: false
+      run_tests.kernel:
+        types: 'PHPUnit-Kernel'
+        testgroups: '--all'
+        suppress-deprecations: true
+        halt-on-fail: false
       run_tests.functional:
         types: 'PHPUnit-Functional'
         testgroups: '--all'

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @coversDefaultClass \Drupal\image_effects\Component\MatrixUtility
  *
- * @group Image Effects
+ * @group image_effects
  */
 class MatrixUtilityTest extends TestCase {
 

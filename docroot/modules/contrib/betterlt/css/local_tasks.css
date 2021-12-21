@@ -9,11 +9,10 @@
 .block-local-tasks-block {
   position: fixed;
   top: 50%;
-  left: 0;
   transform: translateY(-50%);
   z-index: 9999;
-  width: 150px;
-  left: -110px;
+  width: 164px;
+  left: -124px;
   transition: all 0.25s ease;
 }
 
@@ -49,7 +48,6 @@
   padding: 2px;
   padding-right: 32px;
   color: #fff;
-  /*width: 100%;*/
   width: auto;
   border: 0;
   background-color: transparent;
@@ -57,7 +55,7 @@
   background-repeat: no-repeat;
   background-position: right 50%;
   font-family: Verdana, Geneva, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 24px;
 }
 .block-local-tasks-block ul.blt-tabs li.is-active {
@@ -84,8 +82,20 @@
 .block-local-tasks-block ul.blt-tabs li a.translate {
   background-image: url('../img/icon-translate.svg');
 }
+.block-local-tasks-block ul.blt-tabs li a.shortcuts {
+  background-image: url('../img/icon-shortcuts.svg');
+}
+.block-local-tasks-block ul.blt-tabs li a.managedisplay {
+  background-image: url('../img/icon-managedisplay.svg');
+}
+.block-local-tasks-block ul.blt-tabs li a.newdraft {
+  background-image: url('../img/icon-newdraft.svg');
+}
+.block-local-tasks-block ul.blt-tabs li a.clone {
+  background-image: url('../img/icon-clone.svg');
+}
 .block-local-tasks-block ul.blt-tabs li:hover {
-  left: 104px;
+  left: calc(100% - 40px);
   opacity: 1;
   background-color: #222;
 }

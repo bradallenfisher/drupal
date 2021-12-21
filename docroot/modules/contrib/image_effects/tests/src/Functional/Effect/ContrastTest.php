@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Contrast effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class ContrastTest extends ImageEffectsTestBase {
 

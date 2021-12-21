@@ -52,6 +52,8 @@ class ArchiveManager
 
     /**
      * @param ArchiverInterface $archiver
+     *
+     * @return void
      */
     public function addArchiver(ArchiverInterface $archiver)
     {
@@ -88,7 +90,7 @@ class ArchiveManager
         }
         $nameParts = array($baseName);
 
-        if (preg_match('{^[a-f0-9]{40}$}', $package->getDistReference())) {
+        if (null !== $package->getDistReference() && preg_match('{^[a-f0-9]{40}$}', $package->getDistReference())) {
             array_push($nameParts, $package->getDistReference(), $package->getDistType());
         } else {
             array_push($nameParts, $package->getPrettyVersion(), $package->getDistReference());

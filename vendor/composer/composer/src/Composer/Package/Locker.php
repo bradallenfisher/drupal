@@ -46,8 +46,10 @@ class Locker
     private $dumper;
     /** @var ProcessExecutor */
     private $process;
-    private $lockDataCache;
-    private $virtualFileWritten;
+    /** @var mixed[]|null */
+    private $lockDataCache = null;
+    /** @var bool */
+    private $virtualFileWritten = false;
 
     /**
      * Initializes packages locker.
@@ -186,11 +188,7 @@ class Locker
             if (isset($lockData['aliases'])) {
                 foreach ($lockData['aliases'] as $alias) {
                     if (isset($packageByName[$alias['package']])) {
-                        if ($packageByName[$alias['package']] instanceof CompletePackageInterface) {
-                            $aliasPkg = new CompleteAliasPackage($packageByName[$alias['package']], $alias['alias_normalized'], $alias['alias']);
-                        } else {
-                            $aliasPkg = new AliasPackage($packageByName[$alias['package']], $alias['alias_normalized'], $alias['alias']);
-                        }
+                        $aliasPkg = new CompleteAliasPackage($packageByName[$alias['package']], $alias['alias_normalized'], $alias['alias']);
                         $aliasPkg->setRootPackageAlias(true);
                         $packages->addPackage($aliasPkg);
                     }
@@ -253,6 +251,9 @@ class Locker
         return $requirements;
     }
 
+    /**
+     * @return string
+     */
     public function getMinimumStability()
     {
         $lockData = $this->getLockData();
@@ -260,6 +261,9 @@ class Locker
         return isset($lockData['minimum-stability']) ? $lockData['minimum-stability'] : 'stable';
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getStabilityFlags()
     {
         $lockData = $this->getLockData();
@@ -267,6 +271,9 @@ class Locker
         return isset($lockData['stability-flags']) ? $lockData['stability-flags'] : array();
     }
 
+    /**
+     * @return bool|null
+     */
     public function getPreferStable()
     {
         $lockData = $this->getLockData();
@@ -276,6 +283,9 @@ class Locker
         return isset($lockData['prefer-stable']) ? $lockData['prefer-stable'] : null;
     }
 
+    /**
+     * @return bool|null
+     */
     public function getPreferLowest()
     {
         $lockData = $this->getLockData();
@@ -285,6 +295,9 @@ class Locker
         return isset($lockData['prefer-lowest']) ? $lockData['prefer-lowest'] : null;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getPlatformOverrides()
     {
         $lockData = $this->getLockData();
@@ -292,6 +305,11 @@ class Locker
         return isset($lockData['platform-overrides']) ? $lockData['platform-overrides'] : array();
     }
 
+    /**
+     * @return string[][]
+     *
+     * @phpstan-return list<array{package: string, version: string, alias: string, alias_normalized: string}>
+     */
     public function getAliases()
     {
         $lockData = $this->getLockData();
@@ -299,6 +317,9 @@ class Locker
         return isset($lockData['aliases']) ? $lockData['aliases'] : array();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getLockData()
     {
         if (null !== $this->lockDataCache) {
@@ -315,19 +336,21 @@ class Locker
     /**
      * Locks provided data into lockfile.
      *
-     * @param array  $packages          array of packages
-     * @param mixed  $devPackages       array of dev packages or null if installed without --dev
-     * @param array  $platformReqs      array of package name => constraint for required platform packages
-     * @param mixed  $platformDevReqs   array of package name => constraint for dev-required platform packages
-     * @param array  $aliases           array of aliases
-     * @param string $minimumStability
-     * @param array  $stabilityFlags
-     * @param bool   $preferStable
-     * @param bool   $preferLowest
-     * @param array  $platformOverrides
-     * @param bool   $write             Whether to actually write data to disk, useful in tests and for --dry-run
+     * @param PackageInterface[]      $packages          array of packages
+     * @param PackageInterface[]|null $devPackages       array of dev packages or null if installed without --dev
+     * @param array<string, string>   $platformReqs      array of package name => constraint for required platform packages
+     * @param array<string, string>   $platformDevReqs   array of package name => constraint for dev-required platform packages
+     * @param string[][]              $aliases           array of aliases
+     * @param string                  $minimumStability
+     * @param array<string, int>      $stabilityFlags
+     * @param bool                    $preferStable
+     * @param bool                    $preferLowest
+     * @param array<string, string>   $platformOverrides
+     * @param bool                    $write             Whether to actually write data to disk, useful in tests and for --dry-run
      *
      * @return bool
+     *
+     * @phpstan-param list<array{package: string, version: string, alias: string, alias_normalized: string}> $aliases
      */
     public function setLockData(array $packages, $devPackages, array $platformReqs, $platformDevReqs, array $aliases, $minimumStability, array $stabilityFlags, $preferStable, $preferLowest, array $platformOverrides, $write = true)
     {
@@ -388,6 +411,13 @@ class Locker
         return false;
     }
 
+    /**
+     * @param PackageInterface[] $packages
+     *
+     * @return mixed[][]
+     *
+     * @phpstan-return list<array<string, mixed>>
+     */
     private function lockPackages(array $packages)
     {
         $locked = array();

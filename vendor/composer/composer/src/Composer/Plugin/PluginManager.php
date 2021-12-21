@@ -39,7 +39,7 @@ class PluginManager
     protected $composer;
     /** @var IOInterface */
     protected $io;
-    /** @var Composer */
+    /** @var ?Composer */
     protected $globalComposer;
     /** @var VersionParser */
     protected $versionParser;
@@ -73,6 +73,8 @@ class PluginManager
 
     /**
      * Loads all plugins from currently installed plugin packages
+     *
+     * @return void
      */
     public function loadInstalledPlugins()
     {
@@ -82,9 +84,7 @@ class PluginManager
 
         $repo = $this->composer->getRepositoryManager()->getLocalRepository();
         $globalRepo = $this->globalComposer ? $this->globalComposer->getRepositoryManager()->getLocalRepository() : null;
-        if ($repo) {
-            $this->loadRepository($repo, false);
-        }
+        $this->loadRepository($repo, false);
         if ($globalRepo) {
             $this->loadRepository($globalRepo, true);
         }
@@ -93,7 +93,7 @@ class PluginManager
     /**
      * Gets all currently active plugin instances
      *
-     * @return array plugins
+     * @return array<PluginInterface> plugins
      */
     public function getPlugins()
     {
@@ -119,6 +119,8 @@ class PluginManager
      * @param PackageInterface $package
      * @param bool             $failOnMissingClasses By default this silently skips plugins that can not be found, but if set to true it fails with an exception
      * @param bool             $isGlobalPlugin       Set to true to denote plugins which are installed in the global Composer directory
+     *
+     * @return void
      *
      * @throws \UnexpectedValueException
      */
@@ -244,6 +246,8 @@ class PluginManager
      *
      * @param PackageInterface $package
      *
+     * @return void
+     *
      * @throws \UnexpectedValueException
      */
     public function deactivatePackage(PackageInterface $package)
@@ -259,6 +263,7 @@ class PluginManager
         }
 
         if ($oldInstallerPlugin) {
+            /** @var \Composer\Installer\InstallerInterface $installer */
             $installer = $this->registeredPlugins[$package->getName()];
             unset($this->registeredPlugins[$package->getName()]);
             $this->composer->getInstallationManager()->removeInstaller($installer);
@@ -276,6 +281,8 @@ class PluginManager
      * instead for BC
      *
      * @param PackageInterface $package
+     *
+     * @return void
      *
      * @throws \UnexpectedValueException
      */
@@ -319,7 +326,10 @@ class PluginManager
      * to do it.
      *
      * @param PluginInterface   $plugin        plugin instance
+     * @param bool              $isGlobalPlugin
      * @param ?PackageInterface $sourcePackage Package from which the plugin comes from
+     *
+     * @return void
      */
     public function addPlugin(PluginInterface $plugin, $isGlobalPlugin = false, PackageInterface $sourcePackage = null)
     {
@@ -347,6 +357,8 @@ class PluginManager
      * to do it.
      *
      * @param PluginInterface $plugin plugin instance
+     *
+     * @return void
      */
     public function removePlugin(PluginInterface $plugin)
     {
@@ -370,6 +382,8 @@ class PluginManager
      * to do it.
      *
      * @param PluginInterface $plugin plugin instance
+     *
+     * @return void
      */
     public function uninstallPlugin(PluginInterface $plugin)
     {
@@ -387,6 +401,9 @@ class PluginManager
      * call this method as early as possible.
      *
      * @param RepositoryInterface $repo Repository to scan for plugins to install
+     * @param bool                $isGlobalRepo
+     *
+     * @return void
      *
      * @throws \RuntimeException
      */
@@ -410,11 +427,11 @@ class PluginManager
     /**
      * Recursively generates a map of package names to packages for all deps
      *
-     * @param InstalledRepository $installedRepo Set of local repos
-     * @param array               $collected     Current state of the map for recursion
-     * @param PackageInterface    $package       The package to analyze
+     * @param InstalledRepository             $installedRepo Set of local repos
+     * @param array<string, PackageInterface> $collected     Current state of the map for recursion
+     * @param PackageInterface                $package       The package to analyze
      *
-     * @return array Map of package names to packages
+     * @return array<string, PackageInterface> Map of package names to packages
      */
     private function collectDependencies(InstalledRepository $installedRepo, array $collected, PackageInterface $package)
     {
@@ -469,7 +486,7 @@ class PluginManager
             array_key_exists($capability, $capabilities)
             && (empty($capabilities[$capability]) || !is_string($capabilities[$capability]) || !trim($capabilities[$capability]))
         ) {
-            throw new \UnexpectedValueException('Plugin '.get_class($plugin).' provided invalid capability class name(s), got '.var_export($capabilities[$capability], 1));
+            throw new \UnexpectedValueException('Plugin '.get_class($plugin).' provided invalid capability class name(s), got '.var_export($capabilities[$capability], true));
         }
 
         return null;
@@ -480,7 +497,7 @@ class PluginManager
      * @param  PluginInterface               $plugin
      * @param  class-string<CapabilityClass> $capabilityClassName The fully qualified name of the API interface which the plugin may provide
      *                                                            an implementation of.
-     * @param  array                         $ctorArgs            Arguments passed to Capability's constructor.
+     * @param  array<mixed>                  $ctorArgs            Arguments passed to Capability's constructor.
      *                                                            Keeping it an array will allow future values to be passed w\o changing the signature.
      * @return null|Capability
      * @phpstan-param class-string<CapabilityClass> $capabilityClassName
@@ -513,7 +530,7 @@ class PluginManager
      * @template CapabilityClass of Capability
      * @param  class-string<CapabilityClass> $capabilityClassName The fully qualified name of the API interface which the plugin may provide
      *                                                            an implementation of.
-     * @param  array                         $ctorArgs            Arguments passed to Capability's constructor.
+     * @param  array<mixed>                  $ctorArgs            Arguments passed to Capability's constructor.
      *                                                            Keeping it an array will allow future values to be passed w\o changing the signature.
      * @return CapabilityClass[]
      */

@@ -25,15 +25,25 @@ use Composer\Util\Http\Response;
  */
 class GitHubDriver extends VcsDriver
 {
+    /** @var string */
     protected $owner;
+    /** @var string */
     protected $repository;
+    /** @var array<string, string> Map of tag name to identifier */
     protected $tags;
+    /** @var array<string, string> Map of branch name to identifier */
     protected $branches;
+    /** @var string */
     protected $rootIdentifier;
+    /** @var mixed[] */
     protected $repoData;
-    protected $hasIssues;
+    /** @var bool */
+    protected $hasIssues = false;
+    /** @var bool */
     protected $isPrivate = false;
+    /** @var bool */
     private $isArchived = false;
+    /** @var array<int, array{type: string, url: string}>|false|null */
     private $fundingInfo;
 
     /**
@@ -44,7 +54,7 @@ class GitHubDriver extends VcsDriver
     protected $gitDriver = null;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function initialize()
     {
@@ -67,13 +77,16 @@ class GitHubDriver extends VcsDriver
         $this->fetchRootIdentifier();
     }
 
+    /**
+     * @return string
+     */
     public function getRepositoryUrl()
     {
         return 'https://'.$this->originUrl.'/'.$this->owner.'/'.$this->repository;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getRootIdentifier()
     {
@@ -85,7 +98,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getUrl()
     {
@@ -97,7 +110,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
     protected function getApiUrl()
     {
@@ -111,7 +124,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getSource($identifier)
     {
@@ -130,7 +143,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDist($identifier)
     {
@@ -140,7 +153,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getComposerInformation($identifier)
     {
@@ -182,6 +195,9 @@ class GitHubDriver extends VcsDriver
         return $this->infoCache[$identifier];
     }
 
+    /**
+     * @return array<int, array{type: string, url: string}>|false
+     */
     private function getFundingInfo()
     {
         if (null !== $this->fundingInfo) {
@@ -265,7 +281,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getFileContent($file, $identifier)
     {
@@ -283,7 +299,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getChangeDate($identifier)
     {
@@ -298,7 +314,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getTags()
     {
@@ -324,7 +340,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getBranches()
     {
@@ -353,7 +369,7 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public static function supports(IOInterface $io, Config $config, $url, $deep = false)
     {
@@ -378,7 +394,7 @@ class GitHubDriver extends VcsDriver
     /**
      * Gives back the loaded <github-api>/repos/<owner>/<repo> result
      *
-     * @return array|null
+     * @return mixed[]|null
      */
     public function getRepoData()
     {
@@ -402,7 +418,9 @@ class GitHubDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
+     *
+     * @param bool $fetchingRepoData
      */
     protected function getContents($url, $fetchingRepoData = false)
     {
@@ -424,9 +442,9 @@ class GitHubDriver extends VcsDriver
                     }
 
                     if (!$this->io->isInteractive()) {
-                        if ($this->attemptCloneFallback()) {
-                            return new Response(array('url' => 'dummy'), 200, array(), 'null');
-                        }
+                        $this->attemptCloneFallback();
+
+                        return new Response(array('url' => 'dummy'), 200, array(), 'null');
                     }
 
                     $scopesIssued = array();
@@ -454,12 +472,12 @@ class GitHubDriver extends VcsDriver
                     }
 
                     if (!$this->io->isInteractive() && $fetchingRepoData) {
-                        if ($this->attemptCloneFallback()) {
-                            return new Response(array('url' => 'dummy'), 200, array(), 'null');
-                        }
+                        $this->attemptCloneFallback();
+
+                        return new Response(array('url' => 'dummy'), 200, array(), 'null');
                     }
 
-                    $rateLimited = $gitHubUtil->isRateLimited($e->getHeaders());
+                    $rateLimited = $gitHubUtil->isRateLimited((array) $e->getHeaders());
 
                     if (!$this->io->hasAuthentication($this->originUrl)) {
                         if (!$this->io->isInteractive()) {
@@ -492,6 +510,7 @@ class GitHubDriver extends VcsDriver
     /**
      * Fetch root identifier from GitHub
      *
+     * @return void
      * @throws TransportException
      */
     protected function fetchRootIdentifier()
@@ -530,6 +549,12 @@ class GitHubDriver extends VcsDriver
         $this->isArchived = !empty($this->repoData['archived']);
     }
 
+    /**
+     * @phpstan-impure
+     *
+     * @return true
+     * @throws \RuntimeException
+     */
     protected function attemptCloneFallback()
     {
         $this->isPrivate = true;
@@ -550,6 +575,11 @@ class GitHubDriver extends VcsDriver
         }
     }
 
+    /**
+     * @param string $url
+     *
+     * @return void
+     */
     protected function setupGitDriver($url)
     {
         $this->gitDriver = new GitDriver(
@@ -562,9 +592,15 @@ class GitHubDriver extends VcsDriver
         $this->gitDriver->initialize();
     }
 
+    /**
+     * @return string|null
+     */
     protected function getNextPage(Response $response)
     {
         $header = $response->getHeader('link');
+        if (!$header) {
+            return null;
+        }
 
         $links = explode(',', $header);
         foreach ($links as $link) {
@@ -572,5 +608,7 @@ class GitHubDriver extends VcsDriver
                 return $match[1];
             }
         }
+
+        return null;
     }
 }

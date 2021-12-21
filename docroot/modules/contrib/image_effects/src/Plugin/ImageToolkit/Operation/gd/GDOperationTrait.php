@@ -279,7 +279,7 @@ trait GDOperationTrait {
           $alpha += 127 * $pct;
         }
         // Get the color index with new alpha.
-        $alpha_color_xy = imagecolorallocatealpha($img, ($color_xy >> 16) & 0xFF, ($color_xy >> 8) & 0xFF, $color_xy & 0xFF, $alpha);
+        $alpha_color_xy = imagecolorallocatealpha($img, ($color_xy >> 16) & 0xFF, ($color_xy >> 8) & 0xFF, $color_xy & 0xFF, (int) $alpha);
         // Set pixel with the new color + opacity.
         if (!imagesetpixel($img, $x, $y, $alpha_color_xy)) {
           return FALSE;

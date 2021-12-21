@@ -18,6 +18,7 @@ class InstallProfileTest extends KernelTestBase {
    */
   public static $modules = [
     'system',
+    'file',
     'helper',
   ];
 

@@ -35,9 +35,9 @@ class ArchivableFilesFinder extends \FilterIterator
     /**
      * Initializes the internal Symfony Finder with appropriate filters
      *
-     * @param string $sources       Path to source files to be archived
-     * @param array  $excludes      Composer's own exclude rules from composer.json
-     * @param bool   $ignoreFilters Ignore filters when looking for files
+     * @param string $sources Path to source files to be archived
+     * @param string[] $excludes Composer's own exclude rules from composer.json
+     * @param bool $ignoreFilters Ignore filters when looking for files
      */
     public function __construct($sources, array $excludes, $ignoreFilters = false)
     {
@@ -89,6 +89,7 @@ class ArchivableFilesFinder extends \FilterIterator
         parent::__construct($this->finder->getIterator());
     }
 
+    #[\ReturnTypeWillChange]
     public function accept()
     {
         /** @var SplFileInfo $current */

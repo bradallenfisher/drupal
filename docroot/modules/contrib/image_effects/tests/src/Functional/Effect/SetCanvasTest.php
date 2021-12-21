@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Set canvas effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class SetCanvasTest extends ImageEffectsTestBase {
 
@@ -67,7 +67,7 @@ class SetCanvasTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"80\" height=\"40\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"80\" height=\"40\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
 
     // Check that ::applyEffect generates image with expected canvas.
     $this->testImageStyle->createDerivative($original_uri, $derivative_uri);
@@ -110,7 +110,7 @@ class SetCanvasTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"70\" height=\"90\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"70\" height=\"90\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
 
     // Check that ::applyEffect generates image with expected canvas.
     $this->testImageStyle->createDerivative($original_uri, $derivative_uri);

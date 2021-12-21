@@ -118,7 +118,7 @@ class GitLab
         }
 
         $this->io->writeError(sprintf('A token will be created and stored in "%s", your password will never be stored', $this->config->getAuthConfigSource()->getName()));
-        $this->io->writeError('To revoke access to this token you can visit '.$scheme.'://'.$originUrl.'/profile/applications');
+        $this->io->writeError('To revoke access to this token you can visit '.$scheme.'://'.$originUrl.'/-/profile/personal_access_tokens');
 
         $attemptCounter = 0;
 
@@ -160,6 +160,14 @@ class GitLab
         throw new \RuntimeException('Invalid GitLab credentials 5 times in a row, aborting.');
     }
 
+    /**
+     * @param string $scheme
+     * @param string $originUrl
+     *
+     * @return array{access_token: non-empty-string, token_type: non-empty-string, expires_in: positive-int}
+     *
+     * @see https://docs.gitlab.com/ee/api/oauth2.html#resource-owner-password-credentials-flow
+     */
     private function createToken($scheme, $originUrl)
     {
         $username = $this->io->ask('Username: ');
@@ -172,7 +180,7 @@ class GitLab
             'username' => $username,
             'password' => $password,
             'grant_type' => 'password',
-        ), null, '&');
+        ), '', '&');
         $options = array(
             'retry-auth-failure' => false,
             'http' => array(

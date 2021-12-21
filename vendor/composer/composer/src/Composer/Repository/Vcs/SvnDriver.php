@@ -28,15 +28,24 @@ use Composer\Downloader\TransportException;
  */
 class SvnDriver extends VcsDriver
 {
+    /** @var string */
     protected $baseUrl;
+    /** @var array<string, string> Map of tag name to identifier */
     protected $tags;
+    /** @var array<string, string> Map of branch name to identifier */
     protected $branches;
+    /** @var ?string */
     protected $rootIdentifier;
 
+    /** @var string|false */
     protected $trunkPath = 'trunk';
+    /** @var string */
     protected $branchesPath = 'branches';
+    /** @var string */
     protected $tagsPath = 'tags';
+    /** @var string */
     protected $packagePath = '';
+    /** @var bool */
     protected $cacheCredentials = true;
 
     /**
@@ -45,7 +54,7 @@ class SvnDriver extends VcsDriver
     private $util;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function initialize()
     {
@@ -81,7 +90,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getRootIdentifier()
     {
@@ -89,7 +98,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getUrl()
     {
@@ -97,7 +106,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getSource($identifier)
     {
@@ -105,7 +114,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDist($identifier)
     {
@@ -113,7 +122,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     protected function shouldCache($identifier)
     {
@@ -121,7 +130,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getComposerInformation($identifier)
     {
@@ -182,7 +191,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getChangeDate($identifier)
     {
@@ -208,7 +217,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getTags()
     {
@@ -237,7 +246,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getBranches()
     {
@@ -290,7 +299,7 @@ class SvnDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public static function supports(IOInterface $io, Config $config, $url, $deep = false)
     {

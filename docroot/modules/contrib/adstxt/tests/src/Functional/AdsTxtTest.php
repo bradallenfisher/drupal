@@ -7,7 +7,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Tests functionality of configured ads.txt files.
  *
- * @group Ads.txt
+ * @group adstxt
  */
 class AdsTxtTest extends BrowserTestBase {
 
@@ -26,7 +26,7 @@ class AdsTxtTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['adstxt', 'node'];
+  protected static $modules = ['adstxt', 'node'];
 
   /**
    * Checks that an administrator can view the configuration page.
@@ -36,8 +36,7 @@ class AdsTxtTest extends BrowserTestBase {
     $this->admin_user = $this->drupalCreateUser(['administer ads.txt']);
     $this->drupalLogin($this->admin_user);
     $this->drupalGet('admin/config/system/adstxt');
-
-    $this->assertFieldById('edit-adstxt-content', NULL, 'The textarea for configuring ads.txt is shown.');
+    $this->assertSession()->fieldExists('edit-adstxt-content');
   }
 
   /**
@@ -48,9 +47,8 @@ class AdsTxtTest extends BrowserTestBase {
     $this->normal_user = $this->drupalCreateUser(['access content']);
     $this->drupalLogin($this->normal_user);
     $this->drupalGet('admin/config/system/adstxt');
-
-    $this->assertResponse(403);
-    $this->assertNoFieldById('edit-adstxt-content', NULL, 'The textarea for configuring ads.txt is not shown for users without appropriate permissions.');
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertSession()->fieldNotExists('edit-adstxt-content');
   }
 
   /**
@@ -58,11 +56,11 @@ class AdsTxtTest extends BrowserTestBase {
    */
   public function testAdsTxtPath() {
     $this->drupalGet('ads.txt');
-    $this->assertResponse(200, 'No local ads.txt file was detected, and an anonymous user is delivered content at the /ads.txt path.');
+    $this->assertSession()->statusCodeEquals(200);
     $this->assertText('greenadexchange.com, 12345, DIRECT, AEC242');
     $this->assertText('blueadexchange.com, 4536, DIRECT');
     $this->assertText('silverssp.com, 9675, RESELLER');
-    $this->assertHeader('Content-Type', 'text/plain; charset=UTF-8', 'The ads.txt file was served with header Content-Type: "text/plain; charset=UTF-8"');
+    $this->assertSession()->responseHeaderEquals('Content-Type', 'text/plain; charset=UTF-8');
   }
 
   /**
@@ -70,11 +68,11 @@ class AdsTxtTest extends BrowserTestBase {
    */
   public function testAppAdsTxtPath() {
     $this->drupalGet('app-ads.txt');
-    $this->assertResponse(200, 'No local ads.txt file was detected, and an anonymous user is delivered content at the /ads.txt path.');
+    $this->assertSession()->statusCodeEquals(200);
     $this->assertText('onetwothree.com, 12345, DIRECT, AEC242');
     $this->assertText('fourfivesix.com, 4536, DIRECT');
     $this->assertText('97whatever.com, 9675, RESELLER');
-    $this->assertHeader('Content-Type', 'text/plain; charset=UTF-8', 'The ads.txt file was served with header Content-Type: "text/plain; charset=UTF-8"');
+    $this->assertSession()->responseHeaderEquals('Content-Type', 'text/plain; charset=UTF-8');
   }
 
   /**
@@ -87,13 +85,15 @@ class AdsTxtTest extends BrowserTestBase {
     $this->drupalGet('admin/config/system/adstxt');
 
     $test_string = "# SimpleTest {$this->randomMachineName()}";
-    $this->drupalPostForm(NULL, ['adstxt_content' => $test_string], t('Save configuration'));
+    $this->submitForm([
+      'adstxt_content' => $test_string
+    ], t('Save configuration'));
 
     $this->drupalLogout();
     $this->drupalGet('ads.txt');
-    $this->assertResponse(200, 'No local ads.txt file was detected, and an anonymous user is delivered content at the /ads.txt path.');
-    $this->assertHeader('Content-Type', 'text/plain; charset=UTF-8', 'The ads.txt file was served with header Content-Type: "text/plain; charset=UTF-8"');
-    $content = $this->getRawContent();
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseHeaderEquals('Content-Type', 'text/plain; charset=UTF-8');
+    $content = $this->getSession()->getPage()->getContent();
     $this->assertTrue($content == $test_string, sprintf('Test string [%s] is displayed in the configured ads.txt file [%s].', $test_string, $content));
   }
 

@@ -8,7 +8,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Interlace effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class InterlaceTest extends ImageEffectsTestBase {
 

@@ -21,7 +21,7 @@ use Composer\IO\IOInterface;
 class HgBitbucketDriver extends BitbucketDriver
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getRootIdentifier()
     {
@@ -31,12 +31,10 @@ class HgBitbucketDriver extends BitbucketDriver
 
         if (null === $this->rootIdentifier) {
             if (!$this->getRepoData()) {
-                // @phpstan-ignore-next-line
                 if (!$this->fallbackDriver) {
                     throw new \LogicException('A fallback driver should be setup if getRepoData returns false');
                 }
 
-                // @phpstan-ignore-next-line
                 return $this->fallbackDriver->getRootIdentifier();
             }
 
@@ -55,7 +53,7 @@ class HgBitbucketDriver extends BitbucketDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public static function supports(IOInterface $io, Config $config, $url, $deep = false)
     {
@@ -73,7 +71,7 @@ class HgBitbucketDriver extends BitbucketDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     protected function setupFallbackDriver($url)
     {
@@ -88,7 +86,7 @@ class HgBitbucketDriver extends BitbucketDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     protected function generateSshUrl()
     {

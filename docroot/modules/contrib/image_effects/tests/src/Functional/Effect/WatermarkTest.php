@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Watermark effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class WatermarkTest extends ImageEffectsTestBase {
 

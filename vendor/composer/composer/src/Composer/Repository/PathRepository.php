@@ -77,7 +77,8 @@ class PathRepository extends ArrayRepository implements ConfigurableRepositoryIn
     private $url;
 
     /**
-     * @var array
+     * @var mixed[]
+     * @phpstan-var array{url: string, options?: array{symlink?: bool, relative?: bool, versions?: array<string, string>}}
      */
     private $repoConfig;
 
@@ -87,14 +88,14 @@ class PathRepository extends ArrayRepository implements ConfigurableRepositoryIn
     private $process;
 
     /**
-     * @var array
+     * @var array{symlink?: bool, relative?: bool, versions?: array<string, string>}
      */
     private $options;
 
     /**
      * Initializes path repository.
      *
-     * @param array       $repoConfig
+     * @param array{url: string, options?: array{symlink?: bool, relative?: bool, versions?: array<string, string>}} $repoConfig
      * @param IOInterface $io
      * @param Config      $config
      */

@@ -7,21 +7,21 @@ This is a list of common pitfalls on using Composer, and how to avoid them.
 
 ## General
 
-1. Before asking anyone, run [`composer diagnose`](../03-cli.md#diagnose) to check
-   for common problems. If it all checks out, proceed to the next steps.
-
-2. When facing any kind of problems using Composer, be sure to **work with the
+1. When facing any kind of problems using Composer, be sure to **work with the
    latest version**. See [self-update](../03-cli.md#self-update) for details.
+
+2. Before asking anyone, run [`composer diagnose`](../03-cli.md#diagnose) to check
+   for common problems. If it all checks out, proceed to the next steps.
 
 3. Make sure you have no problems with your setup by running the installer's
    checks via `curl -sS https://getcomposer.org/installer | php -- --check`.
 
-4. Ensure you're **installing vendors straight from your `composer.json`** via
+4. Try clearing Composer's cache by running `composer clear-cache`.
+
+5. Ensure you're **installing vendors straight from your `composer.json`** via
    `rm -rf vendor && composer update -v` when troubleshooting, excluding any
    possible interferences with existing vendor installations or `composer.lock`
    entries.
-
-5. Try clearing Composer's cache by running `composer clear-cache`.
 
 ## Package not found
 
@@ -84,7 +84,7 @@ indirectly) back on the root package itself, issues can occur in two cases:
 ## I have a dependency which contains a "repositories" definition in its composer.json, but it seems to be ignored.
 
 The [`repositories`](../04-schema.md#repositories) configuration property is defined as [root-only](../04-schema.md#root-package). It is not inherited. You can read more about the reasons behind this in the "[why can't
-composer load repositories recursively?](../faqs/why-can't-composer-load-repositories-recursively.md)" article.
+Composer load repositories recursively?](../faqs/why-can't-composer-load-repositories-recursively.md)" article.
 The simplest work-around to this limitation, is moving or duplicating the `repositories` definition into your root
 composer.json.
 
@@ -189,7 +189,7 @@ manually create a token using the [procedure documented here](authentication-for
 Now Composer should install/update without asking for authentication.
 
 ## proc_open(): fork failed errors
-If composer shows proc_open() fork failed on some commands:
+If Composer shows proc_open() fork failed on some commands:
 
 `PHP Fatal error: Uncaught exception 'ErrorException' with message 'proc_open(): fork failed - Cannot allocate memory' in phar`
 
@@ -216,7 +216,7 @@ You can make a permanent swap file following this [tutorial](https://www.digital
 
 ## proc_open(): failed to open stream errors (Windows)
 
-If composer shows proc_open(NUL) errors on Windows:
+If Composer shows proc_open(NUL) errors on Windows:
 
 `proc_open(NUL): failed to open stream: No such file or directory`
 
@@ -288,7 +288,7 @@ Disable IPv6 on that device (in this case "Wi-Fi"):
 networksetup -setv6off Wi-Fi
 ```
 
-Run composer ...
+Run Composer ...
 
 You can enable IPv6 again with:
 
@@ -312,7 +312,7 @@ As a workaround, open a SSH connection to your Git host before running Composer:
 
 ```bash
 ssh -t git@mygitserver.tld
-composer update
+php composer.phar update
 ```
 
 See also https://github.com/composer/composer/issues/4180 for more information.

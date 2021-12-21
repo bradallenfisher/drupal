@@ -46,15 +46,20 @@ class PlatformRepository extends ArrayRepository
     /**
      * Defines overrides so that the platform can be mocked
      *
-     * Should be an array of package name => version number mappings
+     * Keyed by package name (lowercased)
      *
-     * @var array
+     * @var array<string, array{name: string, version: string}>
      */
     private $overrides = array();
 
+    /** @var Runtime */
     private $runtime;
+    /** @var HhvmDetector */
     private $hhvmDetector;
 
+    /**
+     * @param array<string, string> $overrides
+     */
     public function __construct(array $packages = array(), array $overrides = array(), Runtime $runtime = null, HhvmDetector $hhvmDetector = null)
     {
         $this->runtime = $runtime ?: new Runtime();
@@ -485,7 +490,7 @@ class PlatformRepository extends ArrayRepository
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function addPackage(PackageInterface $package)
     {
@@ -521,6 +526,9 @@ class PlatformRepository extends ArrayRepository
     }
 
     /**
+     * @param array{version: string, name: string} $override
+     * @param string|null $name
+     *
      * @return CompletePackage
      */
     private function addOverriddenPackage(array $override, $name = null)
@@ -543,6 +551,8 @@ class PlatformRepository extends ArrayRepository
      *
      * @param string      $name
      * @param null|string $prettyVersion
+     *
+     * @return void
      */
     private function addExtension($name, $prettyVersion)
     {
@@ -566,7 +576,7 @@ class PlatformRepository extends ArrayRepository
 
         if ($name === 'uuid') {
             $ext->setReplaces(array(
-                new Link('ext-uuid', 'lib-uuid', new Constraint('=', $version), Link::TYPE_REPLACE, $ext->getPrettyVersion()),
+                'lib-uuid' => new Link('ext-uuid', 'lib-uuid', new Constraint('=', $version), Link::TYPE_REPLACE, $ext->getPrettyVersion()),
             ));
         }
 
@@ -588,6 +598,8 @@ class PlatformRepository extends ArrayRepository
      * @param string|null $description
      * @param string[]    $replaces
      * @param string[]    $provides
+     *
+     * @return void
      */
     private function addLibrary($name, $prettyVersion, $description = null, array $replaces = array(), array $provides = array())
     {
@@ -638,6 +650,7 @@ class PlatformRepository extends ArrayRepository
      * be correct.
      *
      * @internal
+     * @return string|null
      */
     public static function getPlatformPhpVersion()
     {

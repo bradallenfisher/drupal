@@ -42,8 +42,13 @@ abstract class ColorUtility {
    *   Opacity as percentage (0 = transparent, 100 = fully opaque).
    */
   public static function rgbaToOpacity($rgba) {
-    $hex = mb_substr($rgba, 7, 2);
-    return $hex ? floor(hexdec($hex) / 255 * 100) : 100;
+    if (!static::validateRgba($rgba)) {
+      if (Color::validateHex($rgba)) {
+        return 100;
+      }
+      throw new \InvalidArgumentException("Invalid color '$rgba' specified for " . __METHOD__);
+    }
+    return floor(hexdec(substr($rgba, -2)) / 255 * 100);
   }
 
   /**
@@ -60,6 +65,20 @@ abstract class ColorUtility {
       return NULL;
     }
     return mb_strtoupper(str_pad(dechex(ceil($value / 100 * 255)), 2, '0', STR_PAD_LEFT));
+  }
+
+  /**
+   * Validates whether a hexadecimal RGBA color value is syntactically correct.
+   *
+   * @param string $hex
+   *   The hexadecimal string to validate. Must contain a leading '#'. Must use
+   *   the long notation (i.e. '#RRGGBBAA').
+   *
+   * @return bool
+   *   TRUE if $hex is valid or FALSE if it is not.
+   */
+  public static function validateRgba(string $hex): bool {
+    return preg_match('/^#([0-9a-fA-F]{8})$/', $hex) === 1;
   }
 
 }

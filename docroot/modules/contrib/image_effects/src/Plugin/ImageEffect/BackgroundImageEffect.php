@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Image\ImageFactory;
 
 /**
- * Class BackgroundImageEffect.
+ * Places the source image anywhere over a selected background image.
  *
  * @ImageEffect(
  *   id = "image_effects_background",

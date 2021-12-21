@@ -5,6 +5,7 @@ namespace Drupal\Tests\layout_section_classes\Functional;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\Tests\layout_builder\Kernel\LayoutBuilderCompatibilityTestBase;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Test layout section classes.
@@ -45,7 +46,11 @@ class LayoutSectionClassesTest extends LayoutBuilderCompatibilityTestBase {
     ]));
     $this->entity->save();
 
-    $this->assertContains('background--wave-dark background--primary-light', $this->renderEntity());
+    $rendered = $this->renderEntity();
+    $this->assertStringContainsString('background--wave-dark background--primary-light', $rendered);
+    $crawler = new Crawler($rendered);
+    // Assert region classes work as expected.
+    $this->assertCount(1, $crawler->filter('.some-region-classes.a-region-class'));
   }
 
   /**

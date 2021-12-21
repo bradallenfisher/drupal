@@ -10,7 +10,12 @@ services:
     arguments: ['@entity_type.manager', '@file.mime_type.guesser']
   helper.install_profile:
     class: Drupal\helper\InstallProfile
-    arguments: ['@extension.list.profile', '@config.factory', '@state', '@module_handler', '@keyvalue']
+    arguments: ['@extension.list.profile', '@config.factory', '@module_handler', '@keyvalue']
   helper.menu:
     class: Drupal\helper\Menu
     arguments: ['@menu.link_tree', '@menu.active_trail']
+  twig.extension.helper:
+    class: Drupal\helper\Twig\HelperExtension
+    arguments: ['@helper.file']
+    tags:
+      - { name: twig.extension }

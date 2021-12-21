@@ -72,6 +72,10 @@ function image_effects_theme() {
     'image_effects_resize_percentage_summary' => [
       'variables' => ['data' => NULL, 'effect' => []],
     ],
+    // Rotate image effect - summary.
+    'image_effects_rotate_summary' => [
+      'variables' => ['data' => NULL, 'effect' => []],
+    ],
     // Scale and Smart Crop image effect - summary.
     'image_effects_scale_and_smart_crop_summary' => [
       'variables' => ['data' => NULL, 'effect' => []],

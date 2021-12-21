@@ -39,7 +39,7 @@ requirements:
 The required version of the `composer-plugin-api` follows the same [rules][7]
 as a normal package's.
 
-The current Composer plugin API version is `2.0.0`.
+The current Composer plugin API version is `2.1.0`.
 
 An example of a valid plugin `composer.json` file (with the autoloading
 part omitted and an optional require-dev dependency on `composer/composer` for IDE auto completion):
@@ -325,12 +325,12 @@ process however, so do not use it in plugins which do not absolutely require it.
 
 [1]: ../04-schema.md#type
 [2]: ../04-schema.md#extra
-[3]: https://github.com/composer/composer/blob/master/src/Composer/Plugin/PluginInterface.php
-[4]: https://github.com/composer/composer/blob/master/src/Composer/Composer.php
-[5]: https://github.com/composer/composer/blob/master/src/Composer/IO/IOInterface.php
-[6]: https://github.com/composer/composer/blob/master/src/Composer/EventDispatcher/EventSubscriberInterface.php
+[3]: https://github.com/composer/composer/blob/main/src/Composer/Plugin/PluginInterface.php
+[4]: https://github.com/composer/composer/blob/main/src/Composer/Composer.php
+[5]: https://github.com/composer/composer/blob/main/src/Composer/IO/IOInterface.php
+[6]: https://github.com/composer/composer/blob/main/src/Composer/EventDispatcher/EventSubscriberInterface.php
 [7]: ../01-basic-usage.md#package-versions
-[8]: https://github.com/composer/composer/blob/master/src/Composer/Plugin/Capable.php
-[9]: https://github.com/composer/composer/blob/master/src/Composer/Plugin/Capability/CommandProvider.php
+[8]: https://github.com/composer/composer/blob/main/src/Composer/Plugin/Capable.php
+[9]: https://github.com/composer/composer/blob/main/src/Composer/Plugin/Capability/CommandProvider.php
 [10]: https://symfony.com/doc/current/components/console.html
-[11]: https://github.com/composer/composer/blob/master/src/Composer/Util/SyncHelper.php
+[11]: https://github.com/composer/composer/blob/main/src/Composer/Util/SyncHelper.php

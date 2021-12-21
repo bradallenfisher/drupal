@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @coversDefaultClass \Drupal\image_effects\Component\PositionedRectangle
  *
- * @group Image Effects
+ * @group image_effects
  */
 class PositionedRectangleTest extends TestCase {
 

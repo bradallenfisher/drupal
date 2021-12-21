@@ -27,9 +27,34 @@ function better_local_tasks_page_attachments_alter(array &$attachments) {
  */
 function better_local_tasks_preprocess_menu_local_task(&$variables) {
   $link_name = $variables['element']['#link']['title'];
-  $link_name = preg_replace('/[^A-Za-z0-9\-]/', '', $link_name);
-  $link_name = preg_replace('/-+/', '-', $link_name);
-  $link_name = strtolower($link_name);
+  /* @var \Drupal\Core\Url $url */
+  $url = $variables['element']['#link']['url'];
+  $route_name = $url->getRouteName();
+
+  if (preg_match('/\.canonical$/', $route_name)) {
+    $link_name = 'view';
+  }
+  elseif (preg_match('/\.edit_form$/', $route_name)) {
+    $link_name = 'edit';
+  }
+  elseif (preg_match('/\.delete_form$/', $route_name)) {
+    $link_name = 'delete';
+  }
+  elseif (preg_match('/\.version_history$/', $route_name)) {
+    $link_name = 'revisions';
+  }
+  elseif (preg_match('/\.devel_load$/', $route_name)) {
+    $link_name = 'devel';
+  }
+  elseif (preg_match('/\.content_translation_overview$/', $route_name)) {
+    $link_name = 'translate';
+  }
+  elseif (preg_match('/\.clone_form$/', $route_name)) {
+    $link_name = 'clone';
+  }
+  elseif ($route_name = 'shortcut.set_switch') {
+    $link_name = 'shortcuts';
+  }
 
   $variables['link']['#attributes']['class'][] = $link_name;
 }

@@ -25,13 +25,17 @@ use Composer\Config;
  */
 class GitDriver extends VcsDriver
 {
+    /** @var array<string, string> Map of tag name to identifier */
     protected $tags;
+    /** @var array<string, string> Map of branch name to identifier */
     protected $branches;
+    /** @var string */
     protected $rootIdentifier;
+    /** @var string */
     protected $repoDir;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function initialize()
     {
@@ -43,7 +47,7 @@ class GitDriver extends VcsDriver
             $this->repoDir = $this->url;
             $cacheUrl = realpath($this->url);
         } else {
-            if (!Cache::isUsable($this->config->get('cache-vcs-dir'))) {
+            if (!Cache::isUsable((string) $this->config->get('cache-vcs-dir'))) {
                 throw new \RuntimeException('GitDriver requires a usable cache directory, and it looks like you set it to be disabled');
             }
 
@@ -81,7 +85,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getRootIdentifier()
     {
@@ -105,7 +109,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getUrl()
     {
@@ -113,7 +117,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getSource($identifier)
     {
@@ -121,7 +125,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getDist($identifier)
     {
@@ -129,7 +133,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getFileContent($file, $identifier)
     {
@@ -144,7 +148,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getChangeDate($identifier)
     {
@@ -157,7 +161,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getTags()
     {
@@ -176,7 +180,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getBranches()
     {
@@ -199,7 +203,7 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public static function supports(IOInterface $io, Config $config, $url, $deep = false)
     {

@@ -30,6 +30,7 @@ class ConfigValidator
 {
     const CHECK_VERSION = 1;
 
+    /** @var IOInterface */
     private $io;
 
     public function __construct(IOInterface $io)
@@ -44,7 +45,7 @@ class ConfigValidator
      * @param int    $arrayLoaderValidationFlags Flags for ArrayLoader validation
      * @param int    $flags                      Flags for validation
      *
-     * @return array a triple containing the errors, publishable errors, and warnings
+     * @return array{list<string>, list<string>, list<string>} a triple containing the errors, publishable errors, and warnings
      */
     public function validate($file, $arrayLoaderValidationFlags = ValidatingArrayLoader::CHECK_ALL, $flags = self::CHECK_VERSION)
     {

@@ -13,55 +13,109 @@ parameters:
 		- engine
 	drupal:
 		drupal_root: '%currentWorkingDirectory%'
-		entityTypeStorageMapping:
-			node: Drupal\node\NodeStorage
-			taxonomy_term: Drupal\taxonomy\TermStorage
-			user: Drupal\user\UserStorage
+		entityMapping:
+			node:
+				class: Drupal\node\Entity\Node
+				storage: Drupal\node\NodeStorage
+			taxonomy_term:
+				class: Drupal\taxonomy\Entity\Term
+				storage: Drupal\taxonomy\TermStorage
+			user:
+				class: Drupal\user\Entity\User
+				storage: Drupal\user\UserStorage
+			block:
+				class: Drupal\block\Entity\Block
 parametersSchema:
 	drupal: structure([
 		drupal_root: string()
-		entityTypeStorageMapping: arrayOf(string())
+		entityMapping: arrayOf(anyOf(
+			structure([
+				class: string()
+			]),
+			structure([
+				class: string()
+				storage: string()
+			])
+		))
 	])
 rules:
-	- PHPStan\Rules\Classes\PluginManagerInspectionRule
-	- PHPStan\Rules\Drupal\Coder\DiscouragedFunctionsRule
-	- PHPStan\Rules\Drupal\GlobalDrupalDependencyInjectionRule
-	- PHPStan\Rules\Drupal\PluginManager\PluginManagerSetsCacheBackendRule
-	- PHPStan\Rules\Deprecations\AccessDeprecatedConstant
+	- mglaman\PHPStanDrupal\Rules\Drupal\Coder\DiscouragedFunctionsRule
+	- mglaman\PHPStanDrupal\Rules\Drupal\GlobalDrupalDependencyInjectionRule
+	- mglaman\PHPStanDrupal\Rules\Drupal\PluginManager\PluginManagerSetsCacheBackendRule
+	- mglaman\PHPStanDrupal\Rules\Deprecations\AccessDeprecatedConstant
 services:
 	-
-		class: PHPStan\Drupal\ServiceMap
+		class: mglaman\PHPStanDrupal\Drupal\ServiceMap
+	-
+		class: mglaman\PHPStanDrupal\Drupal\ExtensionMap
+	-
+		class: mglaman\PHPStanDrupal\Drupal\EntityDataRepository
+		arguments:
+			entityMapping: %drupal.entityMapping%
 
 	-
-		class: PHPStan\Type\EntityTypeManagerGetStorageDynamicReturnTypeExtension
-		arguments:
-			entityTypeStorageMapping: %drupal.entityTypeStorageMapping%
+		class: mglaman\PHPStanDrupal\Type\EntityTypeManagerGetStorageDynamicReturnTypeExtension
 		tags: [phpstan.broker.dynamicMethodReturnTypeExtension]
 	-
-		class: PHPStan\Type\ServiceDynamicReturnTypeExtension
+		class: mglaman\PHPStanDrupal\Type\EntityStorage\EntityStorageDynamicReturnTypeExtension
 		tags: [phpstan.broker.dynamicMethodReturnTypeExtension]
 	-
-		class: PHPStan\Reflection\EntityFieldsViaMagicReflectionExtension
+		class: mglaman\PHPStanDrupal\Type\ContainerDynamicReturnTypeExtension
+		tags: [phpstan.broker.dynamicMethodReturnTypeExtension]
+	-
+		class: mglaman\PHPStanDrupal\Type\DrupalClassResolverDynamicReturnTypeExtension
+		tags: [phpstan.broker.dynamicMethodReturnTypeExtension]
+	-
+		class: mglaman\PHPStanDrupal\Type\EntityQuery\EntityQueryDynamicReturnTypeExtension
+		tags: [phpstan.broker.dynamicMethodReturnTypeExtension]
+	-
+		class: mglaman\PHPStanDrupal\Type\UrlToStringDynamicReturnTypeExtension
+		tags: [phpstan.broker.dynamicMethodReturnTypeExtension]
+	-
+		class: mglaman\PHPStanDrupal\Type\DrupalClassResolverDynamicStaticReturnTypeExtension
+		tags: [phpstan.broker.dynamicStaticMethodReturnTypeExtension]
+	-
+		class: mglaman\PHPStanDrupal\Type\DrupalServiceDynamicReturnTypeExtension
+		tags: [phpstan.broker.dynamicStaticMethodReturnTypeExtension]
+	-
+		class: mglaman\PHPStanDrupal\Reflection\EntityFieldsViaMagicReflectionExtension
 		tags: [phpstan.broker.propertiesClassReflectionExtension]
 	-
-		class: PHPStan\Rules\Drupal\LoadIncludes
+		class: mglaman\PHPStanDrupal\Rules\Classes\ClassExtendsInternalClassRule
 		tags: [phpstan.rules.rule]
 		arguments:
-			- %drupal.drupal_root%
+			reflectionProvider: @reflectionProvider
 	-
-		class: PHPStan\Rules\Drupal\ModuleLoadInclude
+		class: mglaman\PHPStanDrupal\Rules\Classes\PluginManagerInspectionRule
 		tags: [phpstan.rules.rule]
 		arguments:
-			- %drupal.drupal_root%
+			reflectionProvider: @reflectionProvider
+	-
+		class: mglaman\PHPStanDrupal\Rules\Drupal\LoadIncludes
+		tags: [phpstan.rules.rule]
+		arguments:
+			extensionMap: @mglaman\PHPStanDrupal\Drupal\ExtensionMap
+	-
+		class: mglaman\PHPStanDrupal\Rules\Drupal\ModuleLoadInclude
+		tags: [phpstan.rules.rule]
+		arguments:
+			extensionMap: @mglaman\PHPStanDrupal\Drupal\ExtensionMap
 
 	-
-		class: PHPStan\Rules\Deprecations\PluginAnnotationContextDefinitionsRule
+		class: mglaman\PHPStanDrupal\Rules\Deprecations\PluginAnnotationContextDefinitionsRule
 		tags: [phpstan.rules.rule]
 
 	-
-		class: PHPStan\Rules\Deprecations\ConfigEntityConfigExportRule
+		class: mglaman\PHPStanDrupal\Rules\Deprecations\ConfigEntityConfigExportRule
 		tags: [phpstan.rules.rule]
 
 	-
-		class: PHPStan\Rules\Drupal\Tests\BrowserTestBaseDefaultThemeRule
+		class: mglaman\PHPStanDrupal\Rules\Drupal\Tests\BrowserTestBaseDefaultThemeRule
+		tags: [phpstan.rules.rule]
+
+	-
+		class: mglaman\PHPStanDrupal\Rules\Deprecations\GetDeprecatedServiceRule
+		tags: [phpstan.rules.rule]
+	-
+		class: mglaman\PHPStanDrupal\Rules\Deprecations\StaticServiceDeprecatedServiceRule
 		tags: [phpstan.rules.rule]

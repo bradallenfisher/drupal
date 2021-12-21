@@ -7,7 +7,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Settings form test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class SettingsFormTest extends BrowserTestBase {
 
@@ -16,7 +16,7 @@ class SettingsFormTest extends BrowserTestBase {
    */
   protected static $modules = [
     'image_effects',
-    // @todo re-enable when a D9 version is available 'jquery_colorpicker',
+    'jquery_colorpicker',
     'file_mdm',
     'file_mdm_exif',
     'file_mdm_font',
@@ -85,10 +85,8 @@ class SettingsFormTest extends BrowserTestBase {
 
   /**
    * Test JQuery Colorpicker color selector.
-   *
-   * @todo re-enable the test when a D9 version of jquery_colorpicker is available
    */
-  public function __testJqueryColorpickerSelector() {
+  public function testJqueryColorpickerSelector(): void {
     $admin_path = '/admin/config/media/image_effects';
 
     // Get the settings form.

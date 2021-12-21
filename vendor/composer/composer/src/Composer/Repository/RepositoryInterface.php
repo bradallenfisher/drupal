@@ -43,7 +43,7 @@ interface RepositoryInterface extends \Countable
      * @param string                     $name       package name
      * @param string|ConstraintInterface $constraint package version or version constraint to match against
      *
-     * @return PackageInterface|null
+     * @return BasePackage|null
      */
     public function findPackage($name, $constraint);
 
@@ -53,14 +53,14 @@ interface RepositoryInterface extends \Countable
      * @param string                     $name       package name
      * @param string|ConstraintInterface $constraint package version or version constraint to match against
      *
-     * @return PackageInterface[]
+     * @return BasePackage[]
      */
     public function findPackages($name, $constraint = null);
 
     /**
      * Returns list of registered packages.
      *
-     * @return PackageInterface[]
+     * @return BasePackage[]
      */
     public function getPackages();
 
@@ -75,7 +75,10 @@ interface RepositoryInterface extends \Countable
      * @param array<string, BasePackage::STABILITY_*>        $stabilityFlags        an array of package name => BasePackage::STABILITY_* value
      * @param array<string, array<string, PackageInterface>> $alreadyLoaded         an array of package name => package version => package
      *
-     * @return array{namesFound: string[], packages: PackageInterface[]}
+     * @return array
+     *
+     * @phpstan-param  array<string, ConstraintInterface|null> $packageNameMap
+     * @phpstan-return array{namesFound: array<string>, packages: array<BasePackage>}
      */
     public function loadPackages(array $packageNameMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = array());
 
@@ -87,7 +90,7 @@ interface RepositoryInterface extends \Countable
      * @param string $type  The type of package to search for. Defaults to all types of packages
      *
      * @return array[] an array of array('name' => '...', 'description' => '...'|null)
-     * @phpstan-return list<array{name: string, description: ?string}>
+     * @phpstan-return list<array{name: string, description: ?string, abandoned?: string|true}>
      */
     public function search($query, $mode = 0, $type = null);
 

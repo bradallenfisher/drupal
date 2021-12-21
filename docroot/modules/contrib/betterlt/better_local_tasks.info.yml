@@ -5,7 +5,7 @@ package: 'User Interface'
 core: '8.x'
 core_version_requirement: ^8 || ^9
 
-# Information added by Drupal.org packaging script on 2020-05-12
-version: '8.x-1.3'
+# Information added by Drupal.org packaging script on 2021-10-20
+version: '8.x-1.4'
 project: 'betterlt'
-datestamp: 1589267568
+datestamp: 1634749750

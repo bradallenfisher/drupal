@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Opacity effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class OpacityTest extends ImageEffectsTestBase {
 

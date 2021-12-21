@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Background effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class BackgroundTest extends ImageEffectsTestBase {
 
@@ -63,7 +63,7 @@ class BackgroundTest extends ImageEffectsTestBase {
       '#width' => $image->getWidth(),
       '#height' => $image->getHeight(),
     ];
-    $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"360\" height=\"240\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_url, '/') . "\" width=\"360\" height=\"240\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
 
     // Check that ::applyEffect generates image with expected canvas.
     $derivative_uri = $this->testImageStyle->buildUri($original_uri);
@@ -101,8 +101,10 @@ class BackgroundTest extends ImageEffectsTestBase {
         // been destroyed.
         if (PHP_VERSION_ID < 80000) {
           $new_res = $image->getToolkit()->getResource();
-          $this->assertTrue(is_resource($new_res));
+          $this->assertIsResource($new_res);
           $this->assertNotEquals($new_res, $old_res);
+          // @todo In https://www.drupal.org/node/3133236 convert this to
+          // $this->assertIsNotResource($old_res).
           $this->assertFalse(is_resource($old_res));
         }
         // Save image and compare against original, should differ.

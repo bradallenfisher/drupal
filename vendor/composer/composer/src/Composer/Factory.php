@@ -20,7 +20,6 @@ use Composer\Package\Version\VersionGuesser;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryManager;
 use Composer\Repository\RepositoryFactory;
-use Composer\Repository\WritableRepositoryInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Composer\Util\ProcessExecutor;
@@ -38,6 +37,7 @@ use Composer\Autoload\AutoloadGenerator;
 use Composer\Package\Version\VersionParser;
 use Composer\Downloader\TransportException;
 use Composer\Json\JsonValidationException;
+use Composer\Repository\InstalledRepositoryInterface;
 use Seld\JsonLint\JsonParser;
 
 /**
@@ -170,12 +170,13 @@ class Factory
     }
 
     /**
-     * @param  IOInterface|null $io
+     * @param string|null $cwd
+     *
      * @return Config
      */
     public static function createConfig(IOInterface $io = null, $cwd = null)
     {
-        $cwd = $cwd ?: getcwd();
+        $cwd = $cwd ?: (string) getcwd();
 
         $config = new Config(true, $cwd);
 
@@ -228,23 +229,33 @@ class Factory
             $authData = json_decode($composerAuthEnv, true);
 
             if (null === $authData) {
-                throw new \UnexpectedValueException('COMPOSER_AUTH environment variable is malformed, should be a valid JSON object');
+                if ($io) {
+                    $io->writeError('<error>COMPOSER_AUTH environment variable is malformed, should be a valid JSON object</error>');
+                }
+            } else {
+                if ($io && $io->isDebug()) {
+                    $io->writeError('Loading auth config from COMPOSER_AUTH');
+                }
+                $config->merge(array('config' => $authData));
             }
-
-            if ($io && $io->isDebug()) {
-                $io->writeError('Loading auth config from COMPOSER_AUTH');
-            }
-            $config->merge(array('config' => $authData));
         }
 
         return $config;
     }
 
+    /**
+     * @return string
+     */
     public static function getComposerFile()
     {
         return trim(getenv('COMPOSER')) ?: './composer.json';
     }
 
+    /**
+     * @param string $composerFile
+     *
+     * @return string
+     */
     public static function getLockFile($composerFile)
     {
         return "json" === pathinfo($composerFile, PATHINFO_EXTENSION)
@@ -252,6 +263,9 @@ class Factory
                 : $composerFile . '.lock';
     }
 
+    /**
+     * @return array{highlight: OutputFormatterStyle, warning: OutputFormatterStyle}
+     */
     public static function createAdditionalStyles()
     {
         return array(
@@ -276,18 +290,19 @@ class Factory
     /**
      * Creates a Composer instance
      *
-     * @param  IOInterface               $io             IO instance
-     * @param  array|string|null         $localConfig    either a configuration array or a filename to read from, if null it will
-     *                                                   read from the default filename
-     * @param  bool                      $disablePlugins Whether plugins should not be loaded
-     * @param  bool                      $fullLoad       Whether to initialize everything or only main project stuff (used when loading the global composer)
+     * @param  IOInterface                       $io             IO instance
+     * @param  array<string, mixed>|string|null  $localConfig    either a configuration array or a filename to read from, if null it will
+     *                                                           read from the default filename
+     * @param  bool                              $disablePlugins Whether plugins should not be loaded
+     * @param  string|null                       $cwd
+     * @param  bool                              $fullLoad       Whether to initialize everything or only main project stuff (used when loading the global composer)
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      * @return Composer
      */
     public function createComposer(IOInterface $io, $localConfig = null, $disablePlugins = false, $cwd = null, $fullLoad = true)
     {
-        $cwd = $cwd ?: getcwd();
+        $cwd = $cwd ?: (string) getcwd();
 
         // load Composer configuration
         if (null === $localConfig) {
@@ -434,9 +449,7 @@ class Factory
 
             // once everything is initialized we can
             // purge packages from local repos if they have been deleted on the filesystem
-            if ($rm->getLocalRepository()) {
-                $this->purgePackages($rm->getLocalRepository(), $im);
-            }
+            $this->purgePackages($rm->getLocalRepository(), $im);
         }
 
         return $composer;
@@ -457,6 +470,8 @@ class Factory
     /**
      * @param Repository\RepositoryManager $rm
      * @param string                       $vendorDir
+     *
+     * @return void
      */
     protected function addLocalRepository(IOInterface $io, RepositoryManager $rm, $vendorDir, RootPackageInterface $rootPackage, ProcessExecutor $process = null)
     {
@@ -469,7 +484,9 @@ class Factory
     }
 
     /**
-     * @param  Config        $config
+     * @param bool $disablePlugins
+     * @param bool $fullLoad
+     *
      * @return Composer|null
      */
     protected function createGlobalComposer(IOInterface $io, Config $config, $disablePlugins, $fullLoad = false)
@@ -570,9 +587,7 @@ class Factory
     }
 
     /**
-     * @param Installer\InstallationManager $im
-     * @param Composer                      $composer
-     * @param IO\IOInterface                $io
+     * @return void
      */
     protected function createDefaultInstallers(Installer\InstallationManager $im, Composer $composer, IOInterface $io, ProcessExecutor $process = null)
     {
@@ -585,10 +600,12 @@ class Factory
     }
 
     /**
-     * @param WritableRepositoryInterface   $repo repository to purge packages from
-     * @param Installer\InstallationManager $im   manager to check whether packages are still installed
+     * @param InstalledRepositoryInterface   $repo repository to purge packages from
+     * @param Installer\InstallationManager  $im   manager to check whether packages are still installed
+     *
+     * @return void
      */
-    protected function purgePackages(WritableRepositoryInterface $repo, Installer\InstallationManager $im)
+    protected function purgePackages(InstalledRepositoryInterface $repo, Installer\InstallationManager $im)
     {
         foreach ($repo->getPackages() as $package) {
             if (!$im->isPackageInstalled($repo, $package)) {
@@ -597,6 +614,9 @@ class Factory
         }
     }
 
+    /**
+     * @return Package\Loader\RootPackageLoader
+     */
     protected function loadRootPackage(RepositoryManager $rm, Config $config, VersionParser $parser, VersionGuesser $guesser, IOInterface $io)
     {
         return new Package\Loader\RootPackageLoader($rm, $config, $parser, $guesser, $io);
@@ -621,7 +641,7 @@ class Factory
      *
      * @param  IOInterface    $io      IO instance
      * @param  Config         $config  Config instance
-     * @param  array          $options Array of options passed directly to HttpDownloader constructor
+     * @param  mixed[]        $options Array of options passed directly to HttpDownloader constructor
      * @return HttpDownloader
      */
     public static function createHttpDownloader(IOInterface $io, Config $config, $options = array())
@@ -632,7 +652,7 @@ class Factory
         if (isset($_SERVER['argv']) && in_array('disable-tls', $_SERVER['argv']) && (in_array('conf', $_SERVER['argv']) || in_array('config', $_SERVER['argv']))) {
             $warned = true;
             $disableTls = !extension_loaded('openssl');
-        } elseif ($config && $config->get('disable-tls') === true) {
+        } elseif ($config->get('disable-tls') === true) {
             if (!$warned) {
                 $io->writeError('<warning>You are running Composer with SSL/TLS protection disabled.</warning>');
             }
@@ -644,10 +664,10 @@ class Factory
         }
         $httpDownloaderOptions = array();
         if ($disableTls === false) {
-            if ($config && $config->get('cafile')) {
+            if ($config->get('cafile')) {
                 $httpDownloaderOptions['ssl']['cafile'] = $config->get('cafile');
             }
-            if ($config && $config->get('capath')) {
+            if ($config->get('capath')) {
                 $httpDownloaderOptions['ssl']['capath'] = $config->get('capath');
             }
             $httpDownloaderOptions = array_replace_recursive($httpDownloaderOptions, $options);

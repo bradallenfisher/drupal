@@ -29,7 +29,7 @@ class SuggestedPackagesReporter
     const MODE_BY_SUGGESTION = 4;
 
     /**
-     * @var array
+     * @var array<array{source: string, target: string, reason: string}>
      */
     protected $suggestedPackages = array();
 
@@ -44,7 +44,7 @@ class SuggestedPackagesReporter
     }
 
     /**
-     * @return array Suggested packages with source, target and reason keys.
+     * @return array<array{source: string, target: string, reason: string}> Suggested packages with source, target and reason keys.
      */
     public function getPackages()
     {

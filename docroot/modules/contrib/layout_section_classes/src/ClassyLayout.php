@@ -18,12 +18,24 @@ class ClassyLayout extends LayoutDefault implements PluginFormInterface {
     $build = parent::build($regions);
     $classes = $this->configuration['additional']['classes'] ?? [];
     $build['#attributes']['class'] = $build['#attributes']['class'] ?? [];
-    foreach ($classes as $class_set) {
+    $definitions = $this->getPluginDefinition()->get('classes');
+    foreach ($classes as $key => $class_set) {
+      $definition = $definitions[$key];
       if (is_string($class_set) && $class_set) {
         $build['#attributes']['class'][] = $class_set;
       }
       if (is_array($class_set)) {
         $build['#attributes']['class'] = array_merge($build['#attributes']['class'], array_filter($class_set));
+      }
+      if ($definition['region_classes'] ?? FALSE) {
+        $class_set = (array) $class_set;
+        foreach ($class_set as $class) {
+          if ($region_classes = ($definition['region_classes'][$class] ?? FALSE)) {
+            foreach ($region_classes as $region => $region_class) {
+              $build[$region]['#attributes']['class'][] = $region_class;
+            }
+          }
+        }
       }
     }
     return $build;
@@ -41,7 +53,7 @@ class ClassyLayout extends LayoutDefault implements PluginFormInterface {
     ];
     $plugin_configuration = $this->configuration['additional']['classes'] ?? [];
     foreach ($this->getPluginDefinition()->get('classes') as $key => $class_definition) {
-      if (!is_array($class_definition['options']) || empty($class_definition['options'])) {
+      if (empty($class_definition['options']) || !is_array($class_definition['options'])) {
         throw new \Exception('The "options" key is required for layout class definitions.');
       }
       $definition_default = $class_definition['default'] ?? NULL;

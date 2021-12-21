@@ -11,6 +11,9 @@ test_layout:
         'background--primary-light': 'Light background'
         'background--wave-dark background--primary-light': 'Wave background'
       description: 'Select the visual style for this region.'
+      region_classes:
+        'background--wave-dark background--primary-light':
+          content: 'a-region-class'
     spacing:
       label: 'Spacing'
       multiple: false

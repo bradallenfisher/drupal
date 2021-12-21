@@ -3,7 +3,7 @@
   "description": "Provides a better, fancier UI for drupal local tasks.",
   "type": "drupal-module",
   "keywords": ["Drupal"],
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "homepage": "https://www.drupal.org/project/betterlt",
   "authors": [
     {

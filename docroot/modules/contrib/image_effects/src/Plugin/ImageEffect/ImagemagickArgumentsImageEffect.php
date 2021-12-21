@@ -8,7 +8,7 @@ use Drupal\image\ConfigurableImageEffectBase;
 use Drupal\image_effects\Component\ImageUtility;
 
 /**
- * Class ImagemagickArgumentsImageEffect.
+ * Directly enter ImageMagick/GraphicsMagick command line arguments.
  *
  * @ImageEffect(
  *   id = "image_effects_imagemagick_arguments",

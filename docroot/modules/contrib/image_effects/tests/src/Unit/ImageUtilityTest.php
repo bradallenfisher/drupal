@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @coversDefaultClass \Drupal\image_effects\Component\ImageUtility
  *
- * @group Image Effects
+ * @group image_effects
  */
 class ImageUtilityTest extends TestCase {
 

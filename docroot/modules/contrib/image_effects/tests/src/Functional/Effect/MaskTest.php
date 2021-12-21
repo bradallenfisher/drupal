@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Mask effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class MaskTest extends ImageEffectsTestBase {
 

@@ -10,7 +10,7 @@ use Drupal\image\Entity\ImageStyle;
 /**
  * AspectSwitcher effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class AspectSwitcherTest extends ImageEffectsTestBase {
 
@@ -126,7 +126,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
       '#width' => $original_landscape_image->getWidth(),
       '#height' => $original_landscape_image->getHeight(),
     ];
-    $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_landscape_url, '/') . "\" width=\"{$this->effects['landscape']['data']['width']}\" height=\"{$this->effects['landscape']['data']['height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_landscape_url, '/') . "\" width=\"{$this->effects['landscape']['data']['width']}\" height=\"{$this->effects['landscape']['data']['height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
     // Check that ::applyEffect returns expected dimensions.
     $dest_uri = $image_style->buildUri($original_landscape_uri);
     $this->assertTrue($image_style->createDerivative($original_landscape_uri, $dest_uri));
@@ -146,7 +146,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
       '#width' => $original_portrait_image->getWidth(),
       '#height' => $original_portrait_image->getHeight(),
     ];
-    $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"{$this->effects['portrait']['data']['width']}\" height=\"{$this->effects['portrait']['data']['height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"{$this->effects['portrait']['data']['width']}\" height=\"{$this->effects['portrait']['data']['height']}\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
     // Check that ::applyEffect returns expected dimensions.
     $dest_uri = $image_style->buildUri($original_portrait_uri);
     $image_style->createDerivative($original_portrait_uri, $dest_uri);
@@ -161,7 +161,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
     $this->assertNotEquals(0, count($this->fileSystem->scanDirectory('public://styles/' . $this->testImageStyleName, '/.*/')));
     $portrait_image_style = ImageStyle::load('portrait_image_style_test');
     $portrait_image_style->flush();
-    $this->assertFalse(is_dir('public://styles/' . $this->testImageStyleName));
+    $this->assertDirectoryDoesNotExist('public://styles/' . $this->testImageStyleName);
     $this->assertNotEquals($this->getImageStyleCacheTagInvalidations($this->testImageStyleName), $pre_flush_invalidations_parent);
     $this->assertNotEquals($this->getImageStyleCacheTagInvalidations('portrait_image_style_test'), $pre_flush_invalidations_child);
 
@@ -198,7 +198,7 @@ class AspectSwitcherTest extends ImageEffectsTestBase {
       '#width' => $original_portrait_image->getWidth(),
       '#height' => $original_portrait_image->getHeight(),
     ];
-    $this->assertRegExp("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"20\" height=\"40\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
+    $this->assertMatchesRegularExpression("/\<img src=\"" . preg_quote($derivative_portrait_url, '/') . "\" width=\"20\" height=\"40\" alt=\"\" .*class=\"image\-style\-image\-effects\-test\" \/\>/", $this->getImageTag($variables));
     // Check that ::applyEffect returns expected dimensions.
     $dest_uri = $image_style->buildUri($original_portrait_uri);
     $image_style->createDerivative($original_portrait_uri, $dest_uri);

@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class WatermarkImageEffect.
+ * Adds watermark image.
  *
  * @ImageEffect(
  *   id = "image_effects_watermark",

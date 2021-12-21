@@ -44,6 +44,13 @@ class Config {
   protected $fileSystem;
 
   /**
+   * Flag if existing active config should be updated when importing.
+   *
+   * @var bool
+   */
+  protected $updateExistingConfig = TRUE;
+
+  /**
    * Config constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -60,6 +67,29 @@ class Config {
     $this->configManager = $config_manager;
     $this->logger = $logger;
     $this->fileSystem = $file_system;
+  }
+
+  /**
+   * Sets a flag to update existing configuration when importing the same file.
+   *
+   * @param bool $update
+   *   TRUE to allow updates to existing configuration on file import, or FALSE
+   *   to ignore imports when existing configuration already exists.
+   *
+   * @return static
+   */
+  public function updateExisting($update = TRUE) {
+    $this->updateExistingConfig = $update;
+    return $this;
+  }
+
+  /**
+   * Skip config imports if existing configuration already exists.
+   *
+   * @return static
+   */
+  public function skipExisting() {
+    return $this->updateExisting(FALSE);
   }
 
   /**
@@ -85,8 +115,6 @@ class Config {
       throw new \RuntimeException("Unable to decode YAML from $uri.");
     }
 
-    $this->logger->notice('Importing @uri.', ['@uri' => $uri]);
-
     $config_name = basename($uri, '.yml');
     $entity_type_id = $this->configManager->getEntityTypeIdByName($config_name);
     if ($entity_type_id) {
@@ -98,14 +126,25 @@ class Config {
       /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
       $entity = $entity_storage->create($data);
       if ($existing_entity = $entity_storage->load($entity_id)) {
+        if (!$this->updateExistingConfig) {
+          $this->logger->notice('Skipping import of @uri since the configuration already exists.', ['@uri' => $uri]);
+          return;
+        }
         $entity
           ->set('uuid', $existing_entity->uuid())
           ->enforceIsNew(FALSE);
       }
+      $this->logger->notice('Importing @uri.', ['@uri' => $uri]);
       $entity_storage->save($entity);
     }
     else {
-      $this->configFactory->getEditable($config_name)->setData($data)->save();
+      $existing_config = $this->configFactory->getEditable($config_name);
+      if (!$existing_config->isNew() && !$this->updateExistingConfig) {
+        $this->logger->notice('Skipping import of @uri since the configuration already exists.', ['@uri' => $uri]);
+        return;
+      }
+      $this->logger->notice('Importing @uri.', ['@uri' => $uri]);
+      $existing_config->setData($data)->save();
     }
   }
 
@@ -184,7 +223,7 @@ class Config {
       unset($data['uuid']);
     }
 
-    // Merge in additonal information.
+    // Merge in additional information.
     if (!empty($options['merge']) && is_array($options['merge'])) {
       NestedArray::mergeDeep($data, $options['merge']);
     }

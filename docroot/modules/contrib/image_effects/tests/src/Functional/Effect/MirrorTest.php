@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Mirror effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class MirrorTest extends ImageEffectsTestBase {
 

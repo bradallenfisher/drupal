@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Gaussian blur effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class GaussianBlurTest extends ImageEffectsTestBase {
 

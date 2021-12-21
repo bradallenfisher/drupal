@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Invert effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class InvertTest extends ImageEffectsTestBase {
 

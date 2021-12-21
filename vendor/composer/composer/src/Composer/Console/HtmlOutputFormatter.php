@@ -13,12 +13,14 @@
 namespace Composer\Console;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 class HtmlOutputFormatter extends OutputFormatter
 {
+    /** @var array<int, string> */
     private static $availableForegroundColors = array(
         30 => 'black',
         31 => 'red',
@@ -29,6 +31,7 @@ class HtmlOutputFormatter extends OutputFormatter
         36 => 'cyan',
         37 => 'white',
     );
+    /** @var array<int, string> */
     private static $availableBackgroundColors = array(
         40 => 'black',
         41 => 'red',
@@ -39,6 +42,7 @@ class HtmlOutputFormatter extends OutputFormatter
         46 => 'cyan',
         47 => 'white',
     );
+    /** @var array<int, string> */
     private static $availableOptions = array(
         1 => 'bold',
         4 => 'underscore',
@@ -48,13 +52,18 @@ class HtmlOutputFormatter extends OutputFormatter
     );
 
     /**
-     * @param array $styles Array of "name => FormatterStyle" instances
+     * @param array<string, OutputFormatterStyle> $styles Array of "name => FormatterStyle" instances
      */
     public function __construct(array $styles = array())
     {
         parent::__construct(true, $styles);
     }
 
+    /**
+     * @param string $message
+     *
+     * @return string
+     */
     public function format($message)
     {
         $formatted = parent::format($message);
@@ -64,6 +73,11 @@ class HtmlOutputFormatter extends OutputFormatter
         return preg_replace_callback("{\033\[([0-9;]+)m(.*?)\033\[(?:".$clearEscapeCodes.";)*?".$clearEscapeCodes."m}s", array($this, 'formatHtml'), $formatted);
     }
 
+    /**
+     * @param string[] $matches
+     *
+     * @return string
+     */
     private function formatHtml($matches)
     {
         $out = '<span style="';

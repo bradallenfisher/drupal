@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Strip metadata effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class StripMetadataTest extends ImageEffectsTestBase {
 

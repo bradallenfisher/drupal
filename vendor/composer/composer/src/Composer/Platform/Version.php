@@ -26,7 +26,7 @@ class Version
     {
         $isFips = false;
 
-        if (!preg_match('/^(?<version>[0-9.]+)(?<patch>[a-z]{0,2})?(?<suffix>(?:-?(?:dev|pre|alpha|beta|rc|fips)[\d]*)*)?$/', $opensslVersion, $matches)) {
+        if (!preg_match('/^(?<version>[0-9.]+)(?<patch>[a-z]{0,2})?(?<suffix>(?:-?(?:dev|pre|alpha|beta|rc|fips)[\d]*)*)?(?<garbage>-\w+)?$/', $opensslVersion, $matches)) {
             return null;
         }
 
@@ -92,6 +92,12 @@ class Version
         return self::convertVersionId($versionId, 100);
     }
 
+    /**
+     * @param int $versionId
+     * @param int $base
+     *
+     * @return string
+     */
     private static function convertVersionId($versionId, $base)
     {
         return sprintf(

@@ -17,12 +17,13 @@ use Composer\IO\IOInterface;
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
 use Composer\Package\CompleteAliasPackage;
-use Composer\Package\CompletePackageInterface;
+use Composer\Package\CompletePackage;
 use Composer\Package\PackageInterface;
 use Composer\Package\Version\StabilityFilter;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PrePoolCreateEvent;
 use Composer\Repository\PlatformRepository;
+use Composer\Repository\RepositoryInterface;
 use Composer\Repository\RootPackageRepository;
 use Composer\Semver\CompilingMatcher;
 use Composer\Semver\Constraint\Constraint;
@@ -38,10 +39,12 @@ class PoolBuilder
 {
     /**
      * @var int[]
+     * @phpstan-var array<string, BasePackage::STABILITY_*>
      */
     private $acceptableStabilities;
     /**
      * @var int[]
+     * @phpstan-var array<string, BasePackage::STABILITY_*>
      */
     private $stabilityFlags;
     /**
@@ -55,7 +58,7 @@ class PoolBuilder
      */
     private $rootReferences;
     /**
-     * @var EventDispatcher
+     * @var ?EventDispatcher
      */
     private $eventDispatcher;
     /**
@@ -83,15 +86,16 @@ class PoolBuilder
      */
     private $loadedPerRepo = array();
     /**
-     * @var PackageInterface[]
+     * @var BasePackage[]
      */
     private $packages = array();
     /**
-     * @var PackageInterface[]
-     * @phpstan-var list<PackageInterface>
+     * @var BasePackage[]
      */
     private $unacceptableFixedOrLockedPackages = array();
+    /** @var string[] */
     private $updateAllowList = array();
+    /** @var array<string, string> */
     private $skippedLoad = array();
 
     /**
@@ -101,6 +105,8 @@ class PoolBuilder
      *
      * Packages get cleared from this list if they get unlocked as in that case
      * we need to actually load them
+     *
+     * @var array<string, true>
      */
     private $maxExtendedReqs = array();
     /**
@@ -109,6 +115,7 @@ class PoolBuilder
      */
     private $updateAllowWarned = array();
 
+    /** @var int */
     private $indexCounter = 0;
 
     /**
@@ -131,6 +138,10 @@ class PoolBuilder
         $this->io = $io;
     }
 
+    /**
+     * @param RepositoryInterface[] $repositories
+     * @return Pool
+     */
     public function buildPool(array $repositories, Request $request)
     {
         if ($request->getUpdateAllowList()) {
@@ -253,6 +264,10 @@ class PoolBuilder
         return $pool;
     }
 
+    /**
+     * @param string $name
+     * @return void
+     */
     private function markPackageNameForLoading(Request $request, $name, ConstraintInterface $constraint)
     {
         // Skip platform requires at this stage
@@ -308,6 +323,10 @@ class PoolBuilder
         unset($this->loadedPackages[$name]);
     }
 
+    /**
+     * @param RepositoryInterface[] $repositories
+     * @return void
+     */
     private function loadPackagesMarkedForLoading(Request $request, $repositories)
     {
         foreach ($this->packagesToLoad as $name => $constraint) {
@@ -340,7 +359,11 @@ class PoolBuilder
         }
     }
 
-    private function loadPackage(Request $request, PackageInterface $package, $propagateUpdate = true)
+    /**
+     * @param bool $propagateUpdate
+     * @return void
+     */
+    private function loadPackage(Request $request, BasePackage $package, $propagateUpdate = true)
     {
         $index = $this->indexCounter++;
         $this->packages[$index] = $package;
@@ -370,7 +393,7 @@ class PoolBuilder
             } else {
                 $basePackage = $package;
             }
-            if ($basePackage instanceof CompletePackageInterface) {
+            if ($basePackage instanceof CompletePackage) {
                 $aliasPackage = new CompleteAliasPackage($basePackage, $alias['alias_normalized'], $alias['alias']);
             } else {
                 $aliasPackage = new AliasPackage($basePackage, $alias['alias_normalized'], $alias['alias']);
@@ -426,6 +449,7 @@ class PoolBuilder
     /**
      * Checks if a particular name is required directly in the request
      *
+     * @param string $name packageName
      * @return bool
      */
     private function isRootRequire(Request $request, $name)
@@ -437,9 +461,10 @@ class PoolBuilder
 
     /**
      * Checks whether the update allow list allows this package in the lock file to be updated
+     *
      * @return bool
      */
-    private function isUpdateAllowed(PackageInterface $package)
+    private function isUpdateAllowed(BasePackage $package)
     {
         // Path repo packages are never loaded from lock, to force them to always remain in sync
         // unless symlinking is disabled in which case we probably should rather treat them like
@@ -461,6 +486,9 @@ class PoolBuilder
         return false;
     }
 
+    /**
+     * @return void
+     */
     private function warnAboutNonMatchingUpdateAllowList(Request $request)
     {
         foreach ($this->updateAllowList as $pattern => $void) {
@@ -488,6 +516,9 @@ class PoolBuilder
     /**
      * Reverts the decision to use a locked package if a partial update with transitive dependencies
      * found that this package actually needs to be updated
+     *
+     * @param string $name
+     * @return void
      */
     private function unlockPackage(Request $request, $name)
     {
@@ -526,7 +557,11 @@ class PoolBuilder
         }
     }
 
-    private function removeLoadedPackage(Request $request, PackageInterface $package, $index)
+    /**
+     * @param int $index
+     * @return void
+     */
+    private function removeLoadedPackage(Request $request, BasePackage $package, $index)
     {
         unset($this->packages[$index]);
         if (isset($this->aliasMap[spl_object_hash($package)])) {

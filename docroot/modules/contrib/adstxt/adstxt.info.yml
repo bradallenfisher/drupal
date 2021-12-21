@@ -6,7 +6,7 @@ core: 8.x
 core_version_requirement: ^8 || ^9
 configure: adstxt.admin_settings_form
 
-# Information added by Drupal.org packaging script on 2020-11-27
-version: '8.x-1.1'
+# Information added by Drupal.org packaging script on 2021-11-04
+version: '8.x-1.2'
 project: 'adstxt'
-datestamp: 1606469170
+datestamp: 1635984715

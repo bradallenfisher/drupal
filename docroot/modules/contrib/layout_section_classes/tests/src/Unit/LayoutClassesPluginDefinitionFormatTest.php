@@ -29,7 +29,14 @@ class LayoutClassesPluginDefinitionFormatTest extends UnitTestCase {
         ],
       ],
     ];
-    $plugin = new ClassyLayout($configuration, 'foo_plugin', new LayoutDefinition([]));
+    $plugin = new ClassyLayout($configuration, 'foo_plugin', new LayoutDefinition([
+      'classes' => [
+        'foo' => [],
+        'bar' => [],
+        'baz' => [],
+        'qux' => [],
+      ],
+    ]));
     $build = $plugin->build([]);
     $this->assertEquals([
       'class_1',
@@ -55,7 +62,7 @@ class LayoutClassesPluginDefinitionFormatTest extends UnitTestCase {
       }
     });
     unset($form['label']);
-    $this->assertEquals($expected_form, $form);
+    $this->assertEquals($expected_form['classes'], $form['classes']);
   }
 
   /**

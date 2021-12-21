@@ -22,11 +22,18 @@ use Composer\Package\BasePackage;
  */
 class FilterRepository implements RepositoryInterface
 {
-    private $only = array();
-    private $exclude = array();
+    /** @var ?string */
+    private $only = null;
+    /** @var ?string */
+    private $exclude = null;
+    /** @var bool */
     private $canonical = true;
+    /** @var RepositoryInterface */
     private $repo;
 
+    /**
+     * @param array{only?: array<string>, exclude?: array<string>, canonical?: bool} $options
+     */
     public function __construct(RepositoryInterface $repo, array $options)
     {
         if (isset($options['only'])) {
@@ -74,7 +81,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function hasPackage(PackageInterface $package)
     {
@@ -82,7 +89,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function findPackage($name, $constraint)
     {
@@ -94,7 +101,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function findPackages($name, $constraint = null)
     {
@@ -106,7 +113,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function loadPackages(array $packageMap, array $acceptableStabilities, array $stabilityFlags, array $alreadyLoaded = array())
     {
@@ -129,7 +136,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function search($query, $mode = 0, $type = null)
     {
@@ -145,7 +152,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getPackages()
     {
@@ -160,7 +167,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getProviders($packageName)
     {
@@ -175,15 +182,7 @@ class FilterRepository implements RepositoryInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function removePackage(PackageInterface $package)
-    {
-        return $this->repo->removePackage($package);
-    }
-
-    /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     #[\ReturnTypeWillChange]
     public function count()
@@ -195,6 +194,11 @@ class FilterRepository implements RepositoryInterface
         return 0;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     private function isAllowed($name)
     {
         if (!$this->only && !$this->exclude) {

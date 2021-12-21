@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Set transparent color effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class SetTransparentColorTest extends ImageEffectsTestBase {
 

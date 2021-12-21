@@ -1,0 +1,19 @@
+{
+    "name": "drupal/helper",
+    "description": "Provides development helpers.",
+    "type": "drupal-module",
+    "homepage": "https://drupal.org/project/helper",
+    "support": {
+        "issues": "https://drupal.org/project/issues/elper",
+        "source": "https://cgit.drupalcode.org/elper"
+    },
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9 || ^10"
+            }
+        }
+    }
+}

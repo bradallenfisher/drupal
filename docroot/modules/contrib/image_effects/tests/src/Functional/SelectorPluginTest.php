@@ -7,7 +7,7 @@ use Drupal\Core\File\FileSystemInterface;
 /**
  * Selector plugins test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class SelectorPluginTest extends ImageEffectsTestBase {
 
@@ -21,6 +21,7 @@ class SelectorPluginTest extends ImageEffectsTestBase {
     'file_test',
     'file_mdm',
     'file_mdm_font',
+    'vendor_stream_wrapper',
   ];
 
   /**
@@ -71,18 +72,9 @@ class SelectorPluginTest extends ImageEffectsTestBase {
    * Image selector test.
    */
   public function testFontSelector() {
-    $font_path = 'dummy-remote://';
+    $font_path = 'vendor://fileeye/linuxlibertine-fonts/';
     $font_file = 'LinLibertine_Rah.ttf';
     $font_name = 'Linux Libertine';
-
-    // Copy all the font files to the test path.
-    $handle = opendir(drupal_get_path('module', 'image_effects') . '/tests/fonts/LinLibertineTTF_5.3.0_2012_07_02/');
-    while ($file = readdir($handle)) {
-      if (preg_match("/\.[ot]tf$/i", $file) == 1) {
-        $this->fileSystem->copy(drupal_get_path('module', 'image_effects') . '/tests/fonts/LinLibertineTTF_5.3.0_2012_07_02/' . $file, $font_path, FileSystemInterface::EXISTS_REPLACE);
-      }
-    }
-    closedir($handle);
 
     // Test the Basic plugin.
     // Add an effect with the font selector.

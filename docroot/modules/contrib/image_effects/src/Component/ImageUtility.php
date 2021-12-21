@@ -24,10 +24,16 @@ abstract class ImageUtility {
    *   The computed length.
    */
   public static function percentFilter($length_specification, $current_length) {
-    if (strpos($length_specification, '%') !== FALSE) {
-      $length_specification = $current_length !== NULL ? str_replace('%', '', $length_specification) * 0.01 * $current_length : NULL;
+    if ($length_specification === NULL) {
+      return NULL;
     }
-    return is_null($length_specification) ? NULL : (int) $length_specification;
+    if (strpos((string) $length_specification, '%') !== FALSE) {
+      if ($current_length === NULL) {
+        return NULL;
+      }
+      return (int) (str_replace('%', '', $length_specification) * 0.01 * $current_length);
+    }
+    return (int) $length_specification;
   }
 
   /**

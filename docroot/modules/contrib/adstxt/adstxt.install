@@ -62,7 +62,8 @@ function adstxt_requirements($phase) {
         $requirements['adstxt_cleanurl'] = [
           'title' => t('Ads.txt'),
           'severity' => REQUIREMENT_ERROR,
-          'value' => t('Clean URLs are mandatory for this module.'),
+          'value' => t('Not enabled.'),
+          'description' => t('Clean URLs are mandatory for this module.'),
         ];
       }
 
@@ -72,7 +73,8 @@ function adstxt_requirements($phase) {
         $requirements['adstxt_file'] = [
           'title' => t('Ads.txt'),
           'severity' => REQUIREMENT_WARNING,
-          'value' => t('Ads.txt module works only if you remove the existing ads.txt file in your website root.'),
+          'value' => t('ads.txt exists.'),
+          'description' => t('Please remove the existing ads.txt file in the docroot.'),
         ];
       }
   }

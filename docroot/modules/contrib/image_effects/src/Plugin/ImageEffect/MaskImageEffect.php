@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class MaskImageEffect.
+ * Apply a mask to the image.
  *
  * @ImageEffect(
  *   id = "image_effects_mask",

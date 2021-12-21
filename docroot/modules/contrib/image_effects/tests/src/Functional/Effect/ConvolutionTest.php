@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Convolution effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class ConvolutionTest extends ImageEffectsTestBase {
 

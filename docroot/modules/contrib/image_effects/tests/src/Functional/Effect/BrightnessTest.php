@@ -7,7 +7,7 @@ use Drupal\Tests\image_effects\Functional\ImageEffectsTestBase;
 /**
  * Brightness effect test.
  *
- * @group Image Effects
+ * @group image_effects
  */
 class BrightnessTest extends ImageEffectsTestBase {
 

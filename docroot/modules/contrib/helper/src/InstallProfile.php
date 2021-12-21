@@ -7,7 +7,6 @@ use Drupal\Core\Extension\ExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Installer\Exception\InstallerException;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -32,13 +31,6 @@ class InstallProfile {
   protected $configFactory;
 
   /**
-   * The state service.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
-
-  /**
    * The module handler.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -59,17 +51,14 @@ class InstallProfile {
    *   The profile extension list service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
    *   The key/value storage factory.
    */
-  public function __construct(ExtensionList $profileList, ConfigFactoryInterface $configFactory, StateInterface $state, ModuleHandlerInterface $module_handler, KeyValueFactoryInterface $key_value_factory) {
+  public function __construct(ExtensionList $profileList, ConfigFactoryInterface $configFactory, ModuleHandlerInterface $module_handler, KeyValueFactoryInterface $key_value_factory) {
     $this->profileList = $profileList;
     $this->configFactory = $configFactory;
-    $this->state = $state;
     $this->moduleHandler = $module_handler;
     $this->schemaKeyValue = $key_value_factory->get('system.schema');
   }
@@ -97,7 +86,8 @@ class InstallProfile {
     $current_profile = \Drupal::installProfile();
 
     // Forces ExtensionDiscovery to rerun for profiles.
-    $this->state->delete('system.profile.files');
+    // @see https://www.drupal.org/project/drupal/issues/3240928
+    $this->profileList->reset();
 
     // Set the profile in configuration.
     $extension_config = $this->configFactory->getEditable('core.extension');
@@ -151,6 +141,10 @@ class InstallProfile {
    *   If the profile failed any validations.
    */
   public function validateProfile($profile) {
+    // Forces ExtensionDiscovery to rerun for profiles.
+    // @see https://www.drupal.org/project/drupal/issues/3240928
+    $this->profileList->reset();
+
     // Ensure the profile exists.
     if (!$this->profileList->exists($profile)) {
       throw new \InvalidArgumentException("The {$profile} profile does not exist.");

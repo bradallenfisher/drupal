@@ -81,7 +81,8 @@ class DownloadManager
     /**
      * Sets fine tuned preference settings for package level source/dist selection.
      *
-     * @param  array           $preferences array of preferences by package patterns
+     * @param array<string, string> $preferences array of preferences by package patterns
+     *
      * @return DownloadManager
      */
     public function setPreferences(array $preferences)
@@ -163,6 +164,9 @@ class DownloadManager
         return $downloader;
     }
 
+    /**
+     * @return string
+     */
     public function getDownloaderType(DownloaderInterface $downloader)
     {
         return array_search($downloader, $this->downloaders);
@@ -402,6 +406,7 @@ class DownloadManager
 
     /**
      * @return string[]
+     * @phpstan-return array<'dist'|'source'>&non-empty-array
      */
     private function getAvailableSources(PackageInterface $package, PackageInterface $prevPackage = null)
     {
@@ -448,6 +453,8 @@ class DownloadManager
      * Downloaders expect a /path/to/dir without trailing slash
      *
      * If any Installer provides a path with a trailing slash, this can cause bugs so make sure we remove them
+     *
+     * @param string $dir
      *
      * @return string
      */
