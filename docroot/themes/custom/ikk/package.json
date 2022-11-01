@@ -17,7 +17,7 @@
     "gulp-uglify": "3.0.0",
     "autoprefixer": "^9.7.3",
     "gulp-postcss": "^8.0.0",
-    "gulp": "^3.9.1"
+    "gulp": "^4.0.2"
   },
   "dependencies": {}
 }
